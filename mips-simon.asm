@@ -92,6 +92,11 @@ getRandomNum:
 	syscall					#Execute
 	sw		$a1, 0($t1)		#Store generated seed into seed label
 	
+	#PAUSE FOR RANDOMNESS
+	li		$a0, 10			#Sleep for 10ms
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
+	
 	#GENERATE RANDOM RANGE 1-4
 	li		$a1, 4			#Upper bound of range = 4
 	li		$v0, 42			#Load syscall for random int range
