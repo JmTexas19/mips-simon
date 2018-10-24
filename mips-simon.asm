@@ -17,6 +17,9 @@
 	#CLEAR VALUES
 	jal		initializeValues	#Jump and link to initializeValues
 
+	#LOOP BASED ON DIFFICULTY
+	li		$t6, 0			#Counter
+	createSeqLoop:
 	#LOAD ARGUMENTS
 	la		$a0, genID		#Load address of genID into $a0
 	la		$a1, seed		#Load address of seed into $a1
@@ -30,8 +33,15 @@
 	la		$a1, randomNum		#Load address of randomNum into $a1
 	la		$a2, max		#Load address of randomNum into $a2
 	
-	#ADD RANDOM TO SEQ
+	#CORRECT SEQUENCE ELEMENT POSITION
+	move		$t7, $t6		#Copy counter into $t1
+	sll		$t7, $t7, 2		#Multiply by 4
+	add		$a0, $a0, $t7		#Add to array address to set correct element
+	addi		$t6, $t6, 1		#Increment counter
+	
+	#ADD RANDOM TO SEQ AND CHECK LOOP
 	jal		addToSeq		#Jump and link to addToSeq
+	bne		$t0, 5, createSeqLoop	#Loop if counter is not 5 [PLACEHOLDER UNTIL DIFFICULTY IS ADDED]
 	
 	#EXIT
 	li		$v0, 17			#Load exit call
@@ -104,7 +114,6 @@ addToSeq:
 	#ADD TO SEQUENCE ARRAY
 	lw		$t0, 0($a1)		#Load word of randomNum into $t0
 	sw		$t0, 0($a0)		#Store randomNum into sequence
-	addi		$a1, $a1, 4		#Increment to next element in array
 	
 	#INCREMENT MAX
 	lw		$t0, 0($a2)		#Load word of randomNum into $t0
