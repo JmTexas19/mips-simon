@@ -13,6 +13,8 @@
 	#STRINGS
 	winPrompt:		.asciiz "YOU WIN!"	#Win prompt
 	losePrompt:		.asciiz "YOU LOSE!"	#Lose prompt
+	introPrompt:		.asciiz "Welcome to Simon Says! Enter 1 for easy, 2 for normal, 3 for hard. Enter 0 to quit."
+	invalidNumPrompt:	.asciiz "Invalid number entered, please try again."
 .text
 main:
 	#LOAD ARGUMENTS
@@ -22,8 +24,44 @@ main:
 	#CLEAR VALUES
 	jal		initializeValues	#Jump and link to initializeValues
 
+	#PRINT INTRO
+	la		$a0, introPrompt	#Load address of intoPrompt into $a0
+	li		$v0, 4			#Load print string syscall
+	syscall					#Execute
+	
+	#GET USER INPUT
+	li		$v0, 5			#Load syscall for read int
+	syscall		
+	
+	#CHECK USER INPUT
+	beq		$v0, 0, exit		#Branch if $v0 is equal to 2 (QUIT)
+	beq		$v0, 1, easy		#Branch if $v0 is equal to 1 (EASY)
+	beq		$v0, 2, normal		#Branch if $v0 is equal to 2 (NORMAL)
+	beq		$v0, 3, hard		#Branch if $v0 is equal to 3 (HARD)
+	j		invalidNum		#Jump to invalidNum
+	
+	#EASY MODE
+	easy:
+	li		$t0, 5			#Load 5 into $t0
+	sw		$t0, max		#Store 5 into max label	
+	j		continue		#Jump to continue
+	
+	#EASY MODE
+	normal:
+	li		$t0, 8			#Load 8 into $t0
+	sw		$t0, max		#Store 5 into max label	
+	j		continue		#Jump to continue
+	
+	#EASY MODE
+	hard:
+	li		$t0, 11			#Load 11 into $t0
+	sw		$t0, max		#Store 5 into max label	
+	j		continue		#Jump to continue
+	
+	continue:
 	#LOOP BASED ON DIFFICULTY
 	li		$t6, 0			#Counter
+	lw		$t5, max		#Number of sequences
 	createSeqLoop:
 	#LOAD ARGUMENTS
 	la		$a0, genID		#Load address of genID into $a0
@@ -36,7 +74,6 @@ main:
 	#LOAD ARGUMENTS
 	la		$a0, seqArray		#Load address of seqArray into $a0
 	la		$a1, randomNum		#Load address of randomNum into $a1
-	la		$a2, max		#Load address of randomNum into $a2
 	
 	#CORRECT SEQUENCE ELEMENT POSITION
 	move		$t7, $t6		#Copy counter into $t1
@@ -46,7 +83,7 @@ main:
 	
 	#ADD RANDOM TO SEQ AND CHECK LOOP
 	jal		addToSeq		#Jump and link to addToSeq
-	bne		$t0, 5, createSeqLoop	#Loop if counter is not 5 [PLACEHOLDER UNTIL DIFFICULTY IS ADDED]
+	bne		$t6, $t5, createSeqLoop	#Loop if counter is not max
 	
 	#LOAD ARGUMENTS
 	la		$a0, seqArray		#Load address of seqArray into $a0
@@ -87,7 +124,20 @@ main:
 	syscall					#Execute
 	j		main			#Loop program
 	
+	#INVALID NUM
+	invalidNum:
+	la		$a0, invalidNumPrompt	#Load address of invalidNumPrompt into $a0
+	li		$v0, 4			#Load print string syscall
+	syscall					#Execute
+	
+	#PRINT NEWLINE
+	li		$v0, 11			#Load print character syscall
+	addi		$a0, $0, 0xA		#Load ascii character for newline into $a0
+	syscall					#Execute
+	j		main			#Loop program
+	
 	#EXIT
+	exit:
 	li		$v0, 17			#Load exit call
 	syscall					#Execute
 
@@ -104,11 +154,9 @@ initializeValues:
 	addi		$t1, $t1, 1		#Incremement counter
 	addi		$a0, $a0, 4		#Incremement to next element in array
 	bne 		$t1, 25, initLoop	#Loop if counter is not 100
-	subi		$a0, $a0, 100		#Go back to first element
 	
 	#CLEAR MAX
 	sw		$0, 0($a1)		#Reset Max
-	
 	jr		$ra			#Return
 	
 #Procedure: getRandomNum
@@ -158,16 +206,10 @@ getRandomNum:
 #Add generated random to sequence
 #$a0 pointer to seqArray
 #$a1 pointer to randomNum
-#$a2 pointer to max
 addToSeq:
 	#ADD TO SEQUENCE ARRAY
 	lw		$t0, 0($a1)		#Load word of randomNum into $t0
 	sw		$t0, 0($a0)		#Store randomNum into sequence
-	
-	#INCREMENT MAX
-	lw		$t0, 0($a2)		#Load word of randomNum into $t0
-	addi		$t0, $t0, 1		#Increment max by 1
-	sw		$t0, 0($a2)		#Store incremented value into max
 	
 	jr		$ra			#Return
 
@@ -200,7 +242,7 @@ displaySeq:
 	li		$v0, 32			#Load syscall for sleep
 	syscall					#Execute
 	
-	bne		$t0, 5, blinkLoop	#Loop if counter has not reached max
+	bne		$t0, $t1, blinkLoop	#Loop if counter has not reached max
 	
 	jr		$ra			#Return
 	
@@ -226,7 +268,7 @@ userCheck:
 	addi		$t2, $t2, 4		#Increment to next element
 	addi		$t0, $t0, 1		#Increment counter by 1
 	
-	bne		$t0, 5, userCheckLoop	#Loop if counter has not reached max
+	bne		$t0, $t1, userCheckLoop	#Loop if counter has not reached max
 	
 	#USER PASS
 	li		$v0, 1			#Set return to 1 (WIN)
