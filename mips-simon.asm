@@ -7,7 +7,7 @@
 	max:			.word	0		#Max of sequence
 	genID:			.word 	0		#ID of generator
 	seed:			.word	0		#Seed of generator
-	genNum:			.word	0		#Random number generated
+	randomNum:		.word	0		#Random number generated
 
 .text
 	#LOAD ARGUMENTS
@@ -23,7 +23,15 @@
 
 	#GET RANDOM NUM
 	jal		getRandomNum		#Jump and link to getRandomNum
-	sw		$v0, genNum		#Store generated number
+	sw		$v0, randomNum		#Store generated number
+	
+	#LOAD ARGUMENTS
+	la		$a0, seqArray		#Load address of seqArray into $a0
+	la		$a1, randomNum		#Load address of randomNum into $a1
+	la		$a2, max		#Load address of randomNum into $a2
+	
+	#ADD RANDOM TO SEQ
+	jal		addToSeq		#Jump and link to addToSeq
 	
 	#EXIT
 	li		$v0, 17			#Load exit call
@@ -38,7 +46,7 @@ initializeValues:
 	li		$t0, 24			#Max words to clear
 	li		$t1, 0			#Index
 	initLoop:
-	sw		$t1, 0($a0)		#Clear index of array
+	sw		$0, 0($a0)		#Clear index of array
 	addi		$t1, $t1, 1		#Incremement counter
 	addi		$a0, $a0, 4		#Incremement to next element in array
 	bne 		$t1, 25, initLoop	#Loop if counter is not 100
@@ -87,11 +95,23 @@ getRandomNum:
 	
 	jr		$ra			#Return
 	
-#Procedure: getRandomNum
+#Procedure: addToSeq
 #Add generated random to sequence
-#$a0 pointer to genNum
+#$a0 pointer to seqArray
+#$a1 pointer to randomNum
+#$a2 pointer to max
 addToSeq:
+	#ADD TO SEQUENCE ARRAY
+	lw		$t0, 0($a1)		#Load word of randomNum into $t0
+	sw		$t0, 0($a0)		#Store randomNum into sequence
+	addi		$a1, $a1, 4		#Increment to next element in array
 	
+	#INCREMENT MAX
+	lw		$t0, 0($a2)		#Load word of randomNum into $t0
+	addi		$t0, $t0, 1		#Increment max by 1
+	sw		$t0, 0($a2)		#Store incremented value into max
+	
+	jr		$ra			#Return
 
 	
 	
