@@ -1,20 +1,25 @@
-#Julian Marin
-#September 23, 2018
-#MIPS CALCULATOR
+#Julian Marin (jcm5814)
+#October 24, 2018
+#MIPS SIMON SAYS
 
 .data
-	sequenceArray:		.space	20		#Sequence of 5
+	seqArray:		.space	100		#Sequence array
+	max:			.word	0		#Max of sequence
 	genID:			.word 	0		#ID of generator
 	seed:			.word	0		#Seed of generator
 	genNum:			.word	0		#Random number generated
 
 .text
 	#LOAD ARGUMENTS
-	la		$a0, genID		#Load address of genID into $a0
-	la		$a1, seed		#Load address of seed into $a1
+	la		$a0, seqArray		#Load address of seeqArray into $a0
+	la		$a1, max		#Load address of max into $a1
 
 	#CLEAR VALUES
 	jal		initializeValues	#Jump and link to initializeValues
+
+	#LOAD ARGUMENTS
+	la		$a0, genID		#Load address of genID into $a0
+	la		$a1, seed		#Load address of seed into $a1
 
 	#GET RANDOM NUM
 	jal		getRandomNum		#Jump and link to getRandomNum
@@ -26,12 +31,19 @@
 
 #Procedure: initializeValues
 #Clear all values for new game
-#$a0 = pointer to genID
-#$a1 = pointer to seed
-initializeValues:	
-	#SAVE ADDRESSES
-	move		$t0, $a0		#Copy address of genID in $a0 into $t0
-	move		$t1, $a1		#Copy address of seed in $a1 into $t1
+#$a0 = pointer to seqArray
+#$a1 = pointer to max
+initializeValues:
+	#CLEAR SEQUENCE	
+	li		$t0, 24			#Max words to clear
+	li		$t1, 0			#Index
+	initLoop:
+	sw		$t1, 0($a0)		#Clear index of array
+	addi		$t1, $t1, 1		#Incremement counter
+	addi		$a0, $a0, 4		#Incremement to next element in array
+	bne 		$t1, 25, initLoop	#Loop if counter is not 100
+	
+	subi		$a0, $a0, 100		#Go back to first element
 
 	jr		$ra			#Return
 	
@@ -73,7 +85,12 @@ getRandomNum:
 	
 	jr		$ra			#Return
 	
+#Procedure: getRandomNum
+#Add generated random to sequence
+#$a0 pointer to genNum
+addToSeq:
 	
+
 	
 	
 	
