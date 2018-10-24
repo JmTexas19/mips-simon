@@ -50,6 +50,10 @@
 	#DISPLAY SEQUENCE
 	jal		displaySeq		#Jump and link to displaySeq
 	
+	#USER CHECK
+	la		$a0, seqArray		#Load address of seqArray into $a0 (THIS IS DONE TO RESET TO START OF ARRAY)
+	jal		userCheck		#Jump and link to displaySeq
+	
 	#EXIT
 	li		$v0, 17			#Load exit call
 	syscall					#Execute
@@ -167,7 +171,38 @@ displaySeq:
 	
 	jr		$ra			#Return
 	
+#Procedure: userCheck:
+#Display generated sequence to player
+#$a0 pointer to seqArray
+#$a1 pointer to max
+userCheck:
+	#BLINK EACH NUM IN SEQUENCE
+	li		$t0, 0			#Counter
+	lw		$t1, 0($a1)		#Load word of max from $a1
+	move		$t2, $a0		#Copy address of sequence to $t2
+	userCheckLoop:	
+	#GET USER INPUT
+	li		$v0, 5			#Load syscall for read int
+	syscall					#Execute
 	
+	#CHECK IF CORRECT
+	lw		$a0, 0($t2)		#Get element from sequence
+	bne		$v0, $a0, fail		#Check if user input is correct
+	
+	#INCREMENT AND CHECK
+	addi		$t2, $t2, 4		#Increment to next element
+	addi		$t0, $t0, 1		#Increment counter by 1
+	
+	bne		$t0, 5, userCheckLoop	#Loop if counter has not reached max
+	
+	#USER PASS
+	li		$v0, 1			#Set return to 1 (WIN)
+	jr		$ra			#Return
+	
+	#IF USER FAILS
+	fail:
+	li		$v0, 0			#Set return to 0 (LOSE)
+	jr		$ra			#Return
 	
 	
 	
