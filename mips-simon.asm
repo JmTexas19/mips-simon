@@ -42,9 +42,11 @@ initializeValues:
 	addi		$t1, $t1, 1		#Incremement counter
 	addi		$a0, $a0, 4		#Incremement to next element in array
 	bne 		$t1, 25, initLoop	#Loop if counter is not 100
-	
 	subi		$a0, $a0, 100		#Go back to first element
-
+	
+	#CLEAR MAX
+	sw		$0, 0($a1)		#Reset Max
+	
 	jr		$ra			#Return
 	
 #Procedure: getRandomNum
