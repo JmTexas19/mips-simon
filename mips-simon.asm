@@ -43,6 +43,13 @@
 	jal		addToSeq		#Jump and link to addToSeq
 	bne		$t0, 5, createSeqLoop	#Loop if counter is not 5 [PLACEHOLDER UNTIL DIFFICULTY IS ADDED]
 	
+	#LOAD ARGUMENTS
+	la		$a0, seqArray		#Load address of seqArray into $a0
+	la		$a1, max		#Load address of max into $a1
+	
+	#DISPLAY SEQUENCE
+	jal		displaySeq		#Jump and link to displaySeq
+	
 	#EXIT
 	li		$v0, 17			#Load exit call
 	syscall					#Execute
@@ -127,9 +134,38 @@ addToSeq:
 	
 	jr		$ra			#Return
 
+#Procedure: displaySeq
+#Display generated sequence to player
+#$a0 pointer to seqArray
+#$a1 pointer to max
+displaySeq:
+	#BLINK EACH NUM IN SEQUENCE
+	li		$t0, 0			#Counter
+	lw		$t1, 0($a1)		#Load word of max from $a1
+	move		$t2, $a0		#Copy address of sequence to $t2
+	blinkLoop:	
+	#PRINT ELEMENT
+	lw		$a0, 0($t2)		#Get element from sequence
+	li		$v0, 1			#Load syscall for print int
+	syscall					#Execute
 	
+	#INCREMENT AND CHECK
+	addi		$t2, $t2, 4		#Increment to next element
+	addi		$t0, $t0, 1		#Increment counter by 1
 	
+	#PRINT NEWLINE AND CHECK CONDITION
+	li		$v0, 11			#Load print character syscall
+	addi		$a0, $0, 0xA		#Load ascii character for newline into $a0
+	syscall					#Execute
 	
+	#PAUSE
+	li		$a0, 800		#Sleep for 800ms
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
+	
+	bne		$t0, 5, blinkLoop	#Loop if counter has not reached max
+	
+	jr		$ra			#Return
 	
 	
 	
