@@ -7,14 +7,17 @@
 	genID:			.word 	0		#ID of generator
 	seed:			.word	0		#Seed of generator
 
-
-
 .text
-	#CLEAR VALUES
+	#LOAD ARGUMENTS
 	la		$a0, genID		#Load address of genID into $a0
+	la		$a1, seed		#Load address of seed into $a1
+
+	#CLEAR VALUES
 	jal		initializeValues	#Jump and link to initializeValues
 
 	#GET RANDOM NUM
+
+	jal		getRandomNum		#Jump and link to getRandomNum
 	
 	#EXIT
 	li		$v0, 17			#Load exit call
@@ -22,9 +25,31 @@
 
 #Procedure: initializeValues
 #Clear all values for new game
-#Input
+#$a0 = pointer to genID
+#$a1 = pointer to seed
 initializeValues:
 	#CLEAR
-	sw		$0, 0($a0)			#Set generator ID to 0
+	sw		$0, 0($a0)		#Set generator ID to 0
+	
+	#SAVE ADDRESSES
+	move		$t0, $a0		#Copy address of genID in $a0 into $t0
+	move		$t1, $a1		#Copy address of seed in $a1 into $t1
+	
+	#GET AND STORE SYSTEM TIME
+	li		$v0, 30			#Load syscall for systime
+	syscall					#Execute
+	sw		$a0, 0($t1)		#Store systime into seed
+	
+	#SET AND STORE SEED
+	lw		$a0, ($t0)		#Set $a0 to genID
+	lw		$a1, ($t1)		#Set $a1 to seed
+	li		$v0, 40			#Load syscall for seed
+	syscall					#Execute
+	sw		$a1, 0($t1)		#Store generated seed into seed label
 
 	jr		$ra			#Return
+	
+#Procedure: getRandomNum
+#Get random number for sequence
+#
+getRandomNum:
