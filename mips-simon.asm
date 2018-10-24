@@ -16,7 +16,6 @@
 	jal		initializeValues	#Jump and link to initializeValues
 
 	#GET RANDOM NUM
-
 	jal		getRandomNum		#Jump and link to getRandomNum
 	
 	#EXIT
@@ -46,10 +45,44 @@ initializeValues:
 	li		$v0, 40			#Load syscall for seed
 	syscall					#Execute
 	sw		$a1, 0($t1)		#Store generated seed into seed label
+	
+	#RESET ADDRESSES
+	move		$a0, $t0		#Copy address of genID in $t0 into $a0
+	move		$a1, $t1		#Copy address of seed in $t1 into $a1
 
 	jr		$ra			#Return
 	
 #Procedure: getRandomNum
 #Get random number for sequence
-#
+#$a0 = pointer to genID
+#$a1 = pointer to seed
+#$v0 = random number generated
 getRandomNum:
+	#SAVE ADDRESSES
+	move		$t0, $a0		#Copy address of genID in $a0 into $t0
+	move		$t1, $a1		#Copy address of seed in $a1 into $t1
+	
+	#GENERATE RANDOM RANGE 1-4
+	li		$a1, 4			#Upper bound of range = 4
+	li		$v0, 42			#Load syscall for random int range
+	syscall					#Execute
+	addi		$a0, $a0, 1		#Add 1 to make range 1-4
+	
+	#RESET ADDRESSES
+	move		$a0, $t0		#Copy address of genID in $t0 into $a0
+	move		$a1, $t1		#Copy address of seed in $t1 into $a1
+	
+	jr		$ra			#Return
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
