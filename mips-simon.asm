@@ -3,13 +3,18 @@
 #MIPS SIMON SAYS
 
 .data
+	#DATA
 	seqArray:		.space	100		#Sequence array
 	max:			.word	0		#Max of sequence
 	genID:			.word 	0		#ID of generator
 	seed:			.word	0		#Seed of generator
 	randomNum:		.word	0		#Random number generated
-
+	
+	#STRINGS
+	winPrompt:		.asciiz "YOU WIN!"	#Win prompt
+	losePrompt:		.asciiz "YOU LOSE!"	#Lose prompt
 .text
+main:
 	#LOAD ARGUMENTS
 	la		$a0, seqArray		#Load address of seeqArray into $a0
 	la		$a1, max		#Load address of max into $a1
@@ -53,6 +58,34 @@
 	#USER CHECK
 	la		$a0, seqArray		#Load address of seqArray into $a0 (THIS IS DONE TO RESET TO START OF ARRAY)
 	jal		userCheck		#Jump and link to displaySeq
+	
+	#PRINT RESULT
+	beq		$v0, 0, lose		#Branch if return is equal to 0
+	beq		$v0, 1, win		#Branch if return is equal to 1
+	
+	#LOSE
+	lose:
+	la		$a0, losePrompt		#Load address of lose prompt into $a0
+	li		$v0, 4			#Load print string syscall
+	syscall					#Execute
+	
+	#PRINT NEWLINE
+	li		$v0, 11			#Load print character syscall
+	addi		$a0, $0, 0xA		#Load ascii character for newline into $a0
+	syscall					#Execute
+	j		main			#Loop program
+	
+	#WIN
+	win:
+	la		$a0, winPrompt		#Load address of win prompt into $a0
+	li		$v0, 4			#Load print string syscall
+	syscall					#Execute
+	
+	#PRINT NEWLINE
+	li		$v0, 11			#Load print character syscall
+	addi		$a0, $0, 0xA		#Load ascii character for newline into $a0
+	syscall					#Execute
+	j		main			#Loop program
 	
 	#EXIT
 	li		$v0, 17			#Load exit call
