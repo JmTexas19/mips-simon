@@ -3,6 +3,11 @@
 #MIPS SIMON SAYS
 
 .data
+	#STACK
+	stack_beg:
+       				.word   0 : 40
+	stack_end:
+	
 	#DATA
 	seqArray:		.space	100		#Sequence array
 	max:			.word	0		#Max of sequence
@@ -28,6 +33,15 @@
 	
 .text
 main:
+	#STACK
+	la		$sp, stack_end
+
+	#DRAW A DOT
+	la		$a0, 0
+	la		$a1, 0
+	la		$a2, 2
+	jal		drawDot
+
 	#LOAD ARGUMENTS
 	la		$a0, seqArray		#Load address of seeqArray into $a0
 	la		$a1, max		#Load address of max into $a1
@@ -338,7 +352,8 @@ calculateAddress:
 getColour:
 	#GET COLOUR	
 	la		$t0, colourTable	#Load Base
-	sll		$a2, $a2, 2		#Index x4 is offset; #Address is base + offset
+	sll		$a2, $a2, 2		#Index x4 is offset
+	add		$a2, $a2, $t0		#Address is base + offset
 	lw		$v1, 0($a2)		#Get actual color from memory
 
 	jr		$ra			#Return
