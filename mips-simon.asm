@@ -17,7 +17,7 @@
 	invalidNumPrompt:	.asciiz "Invalid number entered, please try again."
 	
 	#COLOR TABLE
-	colorTable:		.word	0x000000	#Black
+	colourTable:		.word	0x000000	#Black
 				.word	0x0000ff	#Blue
 				.word	0x00ff00	#Green
 				.word	0xff0000	#Red
@@ -317,5 +317,34 @@ drawDot:
 	
 	jr		$ra			#Return
 	
+#Procedure: calculateAddress:
+#Convert x and y coordinate to address
+#$a0 = x coordinate (0-31)
+#$a1 = y coordinate (0-31)
+#$v0 = memory address
+calculateAddress:
+	#CALCULATIONS
+	sll		$a0, $a0, 2		#Multiply $a0 by 4
+	sll		$a1, $a1, 5		#Multiply $a1 by 32
+	sll		$a1, $a1, 2		#Multiply $a1 by 4
+	add		$a0, $a0, $a1		#Add $a1 to $a0
+	addi		$v0, $a0, 0x10040000	#Add base address for display + $a0 to $v0
 	
+	jr		$ra			#Return
 	
+#Procedure: getColour:
+#Get the colour based on $a2
+#$a2 = colour number (0-7)
+getColour:
+	#GET COLOUR	
+	la		$t0, colourTable	#Load Base
+	sll		$a2, $a2, 2		#Index x4 is offset; #Address is base + offset
+	lw		$v1, 0($a2)		#Get actual color from memory
+
+	jr		$ra			#Return
+
+
+
+
+
+
