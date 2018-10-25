@@ -43,7 +43,7 @@ main:
 	la		$a3, 14			#square size = 14
 	jal		drawBox			#Jump and link to drawBox
 	
-	#DRAW BLUE SQUARE
+	#DRAW GREEN SQUARE
 	la		$a0, 1			#x = 1
 	la		$a1, 17			#y = 17
 	la		$a2, 2			#colour = 2
@@ -141,6 +141,7 @@ main:
 	
 	#USER CHECK
 	la		$a0, seqArray		#Load address of seqArray into $a0 (THIS IS DONE TO RESET TO START OF ARRAY)
+	la		$a1, max		#Load address of max into $a1 (THIS IS DONE TO RESET TO START OF ARRAY)
 	jal		userCheck		#Jump and link to displaySeq
 	
 	#PRINT RESULT
@@ -265,19 +266,27 @@ addToSeq:
 #$a0 pointer to seqArray
 #$a1 pointer to max
 displaySeq:
+	#MAKE ROOM ON STACK
+	addi		$sp, $sp, -4		#Make room on stack for 1 words
+	sw		$ra, 0($sp)		#Store $ra on element 4 of stack
+
 	#BLINK EACH NUM IN SEQUENCE
-	li		$t0, 0			#Counter
+	li		$s1 0			#Counter
 	lw		$t1, 0($a1)		#Load word of max from $a1
 	move		$t2, $a0		#Copy address of sequence to $t2
+	move		$t4, $a1		#Copy pointer to max to $t4
 	blinkLoop:	
-	#PRINT ELEMENT
-	lw		$a0, 0($t2)		#Get element from sequence
-	li		$v0, 1			#Load syscall for print int
-	syscall					#Execute
+	#BLINK ELEMENT
+	lw		$t3, 0($t2)		#Get element from sequence
+	beq		$t3, 1, blinkBlue	#If element is 1 blink blue
+	beq		$t3, 2, blinkGreen	#If element is 1 blink green
+	beq		$t3, 3, blinkRed	#If element is 1 blink red
+	beq		$t3, 4	blinkMagenta	#If element is 1 blink magenta				
+	returnLoop:				#Return from blink
 	
 	#INCREMENT AND CHECK
 	addi		$t2, $t2, 4		#Increment to next element
-	addi		$t0, $t0, 1		#Increment counter by 1
+	addi		$s1, $s1, 1		#Increment counter by 1
 	
 	#PRINT NEWLINE AND CHECK CONDITION
 	li		$v0, 11			#Load print character syscall
@@ -289,9 +298,85 @@ displaySeq:
 	li		$v0, 32			#Load syscall for sleep
 	syscall					#Execute
 	
-	bne		$t0, $t1, blinkLoop	#Loop if counter has not reached max
+	bne		$s1, $t1, blinkLoop	#Loop if counter has not reached max
+	
+	#RESTORE $RA
+	lw		$ra, 0($sp)		#Restore $ra from stack
+	addi		$sp, $sp, 4		#Readjust stack
 	
 	jr		$ra			#Return
+	
+	#BLINK BLUE
+	blinkBlue:
+	#BLINK
+	la		$a0, 1			#x = 1
+	la		$a1, 1			#y = 1
+	la		$a2, 0			#colour = 0
+	la		$a3, 14			#square size = 14
+	jal		drawBox			#Jump and link to drawBox
+	li		$a0, 800		#Sleep for 800ms
+	
+	#DRAW
+	la		$a0, 1			#x = 1
+	la		$a1, 1			#y = 1
+	la		$a2, 1			#colour = 1
+	la		$a3, 14			#square size = 14
+	jal		drawBox			#Jump and link to drawBox
+	j		returnLoop		#Return back to loop
+	
+	#BLINK GREEN
+	#BLINK
+	la		$a0, 1			#x = 1
+	la		$a1, 17			#y = 17
+	la		$a2, 0			#colour = 0
+	la		$a3, 14			#square size = 14
+	jal		drawBox			#Jump and link to drawBox
+	li		$a0, 800		#Sleep for 800ms
+	
+	#DRAW
+	blinkGreen:
+	la		$a0, 1			#x = 1
+	la		$a1, 17			#y = 17
+	la		$a2, 2			#colour = 2
+	la		$a3, 14			#square size = 14
+	jal		drawBox			#Jump and link to drawBox
+	j		returnLoop		#Return back to loop
+	
+	#BLINK RED
+	#BLINK
+	la		$a0, 17			#x = 17
+	la		$a1, 1			#y = 1
+	la		$a2, 0			#colour = 0
+	la		$a3, 14			#square size = 14
+	jal		drawBox			#Jump and link to drawBox
+	li		$a0, 800		#Sleep for 800ms
+	
+	#DRAW
+	blinkRed:
+	la		$a0, 17			#x = 17
+	la		$a1, 1			#y = 1
+	la		$a2, 3			#colour = 3
+	la		$a3, 14			#square size = 14
+	jal		drawBox			#Jump and link to drawBox
+	j		returnLoop		#Return back to loop
+	
+	#BLINK MAGENTA
+	#BLINK
+	la		$a0, 17			#x = 17
+	la		$a1, 17			#y = 17
+	la		$a2, 0			#colour = 0
+	la		$a3, 14			#square size = 14
+	jal		drawBox			#Jump and link to drawBox
+	li		$a0, 800		#Sleep for 800ms
+	
+	#DRAW
+	blinkMagenta:
+	la		$a0, 17			#x = 17
+	la		$a1, 17			#y = 17
+	la		$a2, 5			#colour = 5
+	la		$a3, 14			#square size = 14
+	jal		drawBox			#Jump and link to drawBox
+	j		returnLoop		#Return back to loop
 	
 #Procedure: userCheck:
 #Display generated sequence to player
