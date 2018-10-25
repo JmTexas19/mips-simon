@@ -19,6 +19,7 @@
 	winPrompt:		.asciiz "YOU WIN!"	#Win prompt
 	losePrompt:		.asciiz "YOU LOSE!"	#Lose prompt
 	introPrompt:		.asciiz "Welcome to Simon Says! Enter 1 for easy, 2 for normal, 3 for hard. Enter 0 to quit."
+	colourPrompt:		.asciiz "BLUE: 1\nGREEN: 2\nRED: 3\nMAGENTA: 4\n"
 	invalidNumPrompt:	.asciiz "Invalid number entered, please try again."
 	
 	#COLOR TABLE
@@ -106,6 +107,11 @@ main:
 	j		continue		#Jump to continue
 	
 	continue:
+	#PRINT COLORS
+	la		$a0, colourPrompt	#Load address of colourPrompt into $a0
+	li		$v0, 4			#Load print string syscall
+	syscall					#Execute
+	
 	#LOOP BASED ON DIFFICULTY
 	li		$t6, 0			#Counter
 	lw		$t5, max		#Number of sequences
@@ -291,11 +297,6 @@ displaySeq:
 	#INCREMENT AND CHECK
 	addi		$t2, $t2, 4		#Increment to next element
 	addi		$s1, $s1, 1		#Increment counter by 1
-	
-	#PRINT NEWLINE AND CHECK CONDITION
-	li		$v0, 11			#Load print character syscall
-	addi		$a0, $0, 0xA		#Load ascii character for newline into $a0
-	syscall					#Execute
 	
 	#PAUSE
 	li		$a0, 800		#Sleep for 800ms
