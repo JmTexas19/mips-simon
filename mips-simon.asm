@@ -112,6 +112,14 @@ main:
 	li		$v0, 4			#Load print string syscall
 	syscall					#Execute
 	
+	#CLEAR
+	jal		clearDisplay		#Clear display
+	
+	#PAUSE
+	li		$a0, 800		#Sleep for 800ms
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
+	
 	#LOOP BASED ON DIFFICULTY
 	li		$t6, 0			#Counter
 	lw		$t5, max		#Number of sequences
@@ -319,6 +327,11 @@ displaySeq:
 	la		$a2, 1			#colour = 1
 	la		$a3, 14			#square size = 14
 	jal		drawBox			#Jump and link to drawBox
+
+	#PAUSE
+	li		$a0, 800		#Sleep for 800ms
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
 	
 	#BLINK
 	la		$a0, 1			#x = 1
@@ -326,7 +339,6 @@ displaySeq:
 	la		$a2, 0			#colour = 0
 	la		$a3, 14			#square size = 14
 	jal		drawBox			#Jump and link to drawBox
-	li		$a0, 800		#Sleep for 800ms
 	j		returnLoop		#Return back to loop
 	
 	#BLINK GREEN
@@ -337,6 +349,11 @@ displaySeq:
 	la		$a2, 2			#colour = 2
 	la		$a3, 14			#square size = 14
 	jal		drawBox			#Jump and link to drawBox
+
+	#PAUSE
+	li		$a0, 800		#Sleep for 800ms
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
 	
 	#BLINK
 	la		$a0, 1			#x = 1
@@ -344,7 +361,6 @@ displaySeq:
 	la		$a2, 0			#colour = 0
 	la		$a3, 14			#square size = 14
 	jal		drawBox			#Jump and link to drawBox
-	li		$a0, 800		#Sleep for 800ms
 	j		returnLoop		#Return back to loop
 	
 	#BLINK RED
@@ -355,14 +371,18 @@ displaySeq:
 	la		$a2, 3			#colour = 3
 	la		$a3, 14			#square size = 14
 	jal		drawBox			#Jump and link to drawBox
+
+	#PAUSE
+	li		$a0, 800		#Sleep for 800ms
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
 	
 	#BLINK
 	la		$a0, 17			#x = 17
 	la		$a1, 1			#y = 1
 	la		$a2, 0			#colour = 0
 	la		$a3, 14			#square size = 14
-	jal		drawBox			#Jump and link to drawBox
-	li		$a0, 800		#Sleep for 800ms
+	jal		drawBox			#Jump and link to drawBoxS
 	j		returnLoop		#Return back to loop
 	
 	#BLINK MAGENTA
@@ -373,6 +393,11 @@ displaySeq:
 	la		$a2, 5			#colour = 5
 	la		$a3, 14			#square size = 14
 	jal		drawBox			#Jump and link to drawBox
+
+	#PAUSE
+	li		$a0, 800		#Sleep for 800ms
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
 	
 	#BLINK
 	la		$a0, 17			#x = 17
@@ -380,7 +405,6 @@ displaySeq:
 	la		$a2, 0			#colour = 0
 	la		$a3, 14			#square size = 14
 	jal		drawBox			#Jump and link to drawBox
-	li		$a0, 800		#Sleep for 800ms
 	j		returnLoop		#Return back to loop
 	
 #Procedure: userCheck:
