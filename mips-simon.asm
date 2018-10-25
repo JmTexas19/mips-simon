@@ -42,6 +42,8 @@ main:
 	la		$a2, 3
 	la		$a3, 32
 	jal		drawBox
+	
+	jal		clearDisplay
 
 	#LOAD ARGUMENTS
 	la		$a0, seqArray		#Load address of seeqArray into $a0
@@ -469,11 +471,26 @@ drawBox:
 	
 	jr		$ra			#Return
 	
+#Procedure: drawBox:
+#Draw a box on the bitmap display
+clearDisplay:
+	#MAKE ROOM ON STACK
+	addi		$sp, $sp, -4		#Make room on stack for 1 words
+	sw		$ra, 0($sp)		#Store $ra on element 4 of stack
 	
+	#GET REGISTERS READY TO CLEAR
+	la		$a0, 0			#x-coordinate = 0
+	la		$a1, 0			#y-coordinate = 0
+	la		$a2, 0			#colour = black
+	la		$a3, 32			#size to clear = 32
 	
+	jal		drawBox			#Clear Screen
 	
+	#RESTORE $RA
+	lw		$ra, 0($sp)		#Restore $ra from stack
+	addi		$sp, $sp, 4		#Readjust stack
 	
-	
+	jr		$ra			#Return
 	
 	
 
