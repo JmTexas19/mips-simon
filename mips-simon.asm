@@ -36,14 +36,33 @@ main:
 	#STACK
 	la		$sp, stack_end
 
-	#DRAW A LINE
-	la		$a0, 0
-	la		$a1, 0
-	la		$a2, 3
-	la		$a3, 32
+	#DRAW BLUE SQUARE
+	la		$a0, 1
+	la		$a1, 1
+	la		$a2, 1
+	la		$a3, 14
 	jal		drawBox
 	
-	jal		clearDisplay
+	#DRAW BLUE SQUARE
+	la		$a0, 1
+	la		$a1, 17
+	la		$a2, 2
+	la		$a3, 14
+	jal		drawBox
+	
+	#DRAW RED SQUARE
+	la		$a0, 17
+	la		$a1, 1
+	la		$a2, 3
+	la		$a3, 14
+	jal		drawBox
+	
+	#DRAW MAGENTA SQUARE
+	la		$a0, 17
+	la		$a1, 17
+	la		$a2, 5
+	la		$a3, 14
+	jal		drawBox
 
 	#LOAD ARGUMENTS
 	la		$a0, seqArray		#Load address of seeqArray into $a0
@@ -442,6 +461,7 @@ drawBox:
 	addi		$sp, $sp, -24		#Make room on stack for 5 words
 	sw		$ra, 12($sp)		#Store $ra on element 4 of stack
 	sw		$a0, 0($sp)		#Store $a0 on element 0 of stack
+	sw		$a1, 4($sp)		#Store $a1 on element 1 of stack
 	sw		$a2, 8($sp)		#Store $a2 on element 2 of stack
 	sw		$a3, 20($sp)		#Store $a3 on element 5 of stack
 	move		$s0, $a3		#Copy $a3 to temp register
