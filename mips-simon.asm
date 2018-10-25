@@ -40,7 +40,7 @@ main:
 	la		$a0, 0
 	la		$a1, 0
 	la		$a2, 3
-	la		$a3, 10
+	la		$a3, 32
 	jal		drawBox
 
 	#LOAD ARGUMENTS
@@ -369,6 +369,7 @@ drawHorzLine:
 	#MAKE ROOM ON STACK AND SAVE REGISTERS
 	addi		$sp, $sp, -16		#Make room on stack for 4 words
 	sw		$ra, 12($sp)		#Store $ra on element 4 of stack
+	sw		$a0, 0($sp)		#Store $a0 on element 0 of stack
 	sw		$a1, 4($sp)		#Store $a1 on element 1 of stack
 	sw		$a2, 8($sp)		#Store $a2 on element 2 of stack
 	
@@ -404,6 +405,7 @@ drawVertLine:
 	addi		$sp, $sp, -16		#Make room on stack for 4 words
 	sw		$ra, 12($sp)		#Store $ra on element 4 of stack
 	sw		$a0, 0($sp)		#Store $a0 on element 0 of stack
+	sw		$a1, 4($sp)		#Store $a0 on element 0 of stack
 	sw		$a2, 8($sp)		#Store $a2 on element 2 of stack
 	
 	#HORIZONTAL LOOP
@@ -435,10 +437,11 @@ drawVertLine:
 #$a3 = size of box (1-32)
 drawBox:
 	#MAKE ROOM ON STACK AND SAVE REGISTERS
-	addi		$sp, $sp, -20		#Make room on stack for 4 words
+	addi		$sp, $sp, -24		#Make room on stack for 5 words
 	sw		$ra, 12($sp)		#Store $ra on element 4 of stack
 	sw		$a0, 0($sp)		#Store $a0 on element 0 of stack
 	sw		$a2, 8($sp)		#Store $a2 on element 2 of stack
+	sw		$a3, 20($sp)		#Store $a3 on element 5 of stack
 	move		$s0, $a3		#Copy $a3 to temp register
 	sw		$s0, 16($sp)		#Store $s0 on element 5 of stack
 	
@@ -449,6 +452,7 @@ drawBox:
 	lw		$a0, 0($sp)		#Restore $a0 from stack
 	lw		$a1, 4($sp)		#Restore $a1 from stack
 	lw		$a2, 8($sp)		#Restore $a2 from stack
+	lw		$a3, 20($sp)		#Restore $a3 from stack
 	lw		$s0, 16($sp)		#Restore $s0 from stack
 	
 	#INCREMENT VALUES
@@ -460,7 +464,7 @@ drawBox:
 	
 	#RESTORE $RA
 	lw		$ra, 12($sp)		#Restore $ra from stack
-	addi		$sp, $sp, 20		#Readjust stack
+	addi		$sp, $sp, 24		#Readjust stack
 	addi		$s0, $s0, 0		#Reset $s0
 	
 	jr		$ra			#Return
