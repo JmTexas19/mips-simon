@@ -15,6 +15,19 @@
 	losePrompt:		.asciiz "YOU LOSE!"	#Lose prompt
 	introPrompt:		.asciiz "Welcome to Simon Says! Enter 1 for easy, 2 for normal, 3 for hard. Enter 0 to quit."
 	invalidNumPrompt:	.asciiz "Invalid number entered, please try again."
+	
+	#COLOR TABLE
+	colorTable:		.word	0x000000	#Black
+				.word	0x0000ff	#Blue
+				.word	0x00ff00	#Green
+				.word	0xff0000	#Red
+				.word	0x00ffff	#Blue-Green
+				.word	0xff00ff	#Blue-Red
+				.word	0xffff00	#Green-Red
+				.word	0xffffff	#White
+	
+	
+	
 .text
 main:
 	#LOAD ARGUMENTS
