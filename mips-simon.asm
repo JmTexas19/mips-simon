@@ -41,7 +41,7 @@ main:
 	la		$a1, 0
 	la		$a2, 2
 	la		$a3, 32
-	jal		drawHorzLine
+	jal		drawVertLine
 
 	#LOAD ARGUMENTS
 	la		$a0, seqArray		#Load address of seeqArray into $a0
@@ -393,6 +393,39 @@ drawHorzLine:
 	
 	jr		$ra			#Return
 
+#Procedure: drawVertLine:
+#Draw a vertical line on the bitmap display
+#$a0 = x coordinate (0-31)
+#$a1 = y coordinate (0-31)
+#$a2 = colour number (0-7)
+#$a3 = length of the line
+drawVertLine:
+	#MAKE ROOM ON STACK AND SAVE REGISTERS
+	addi		$sp, $sp, -16		#Make room on stack for 4 words
+	sw		$ra, 12($sp)		#Store $ra on element 4 of stack
+	sw		$a0, 0($sp)		#Store $a0 on element 0 of stack
+	sw		$a2, 8($sp)		#Store $a2 on element 2 of stack
+	
+	#HORIZONTAL LOOP
+	vertLoop:
+	jal		drawDot			#Jump and Link to drawDot
+	
+	#RESTORE REGISTERS
+	lw		$a0, 0($sp)		#Restore $a0 from stack
+	lw		$a1, 4($sp)		#Restore $a1 from stack
+	lw		$a2, 8($sp)		#Restore $a2 from stack
+	
+	#INCREMENT VALUES
+	addi		$a1, $a1, 1		#Increment x by 1
+	sw		$a1, 4($sp)		#Store $a0 on element 0 of stack
+	addi		$a3, $a3, -1		#Decrement length of line
+	bne		$a3, $0, vertLoop	#If length is not 0, loop
+	
+	#RESTORE $RA
+	lw		$ra, 12($sp)		#Restore $ra from stack
+	addi		$sp, $sp, 16		#Readjust stack
+	
+	jr		$ra			#Return
 
 
 
