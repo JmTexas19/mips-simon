@@ -37,32 +37,32 @@ main:
 	la		$sp, stack_end
 
 	#DRAW BLUE SQUARE
-	la		$a0, 1
-	la		$a1, 1
-	la		$a2, 1
-	la		$a3, 14
-	jal		drawBox
+	la		$a0, 1			#x = 1
+	la		$a1, 1			#y = 1
+	la		$a2, 1			#colour = 1
+	la		$a3, 14			#square size = 14
+	jal		drawBox			#Jump and link to drawBox
 	
 	#DRAW BLUE SQUARE
-	la		$a0, 1
-	la		$a1, 17
-	la		$a2, 2
-	la		$a3, 14
-	jal		drawBox
+	la		$a0, 1			#x = 1
+	la		$a1, 17			#y = 17
+	la		$a2, 2			#colour = 2
+	la		$a3, 14			#square size = 14
+	jal		drawBox			#Jump and link to drawBox
 	
 	#DRAW RED SQUARE
-	la		$a0, 17
-	la		$a1, 1
-	la		$a2, 3
-	la		$a3, 14
-	jal		drawBox
+	la		$a0, 17			#x = 17
+	la		$a1, 1			#y = 1
+	la		$a2, 3			#colour = 3
+	la		$a3, 14			#square size = 14
+	jal		drawBox			#Jump and link to drawBox
 	
 	#DRAW MAGENTA SQUARE
-	la		$a0, 17
-	la		$a1, 17
-	la		$a2, 5
-	la		$a3, 14
-	jal		drawBox
+	la		$a0, 17			#x = 17
+	la		$a1, 17			#y = 17
+	la		$a2, 5			#colour = 5
+	la		$a3, 14			#square size = 14
+	jal		drawBox			#Jump and link to drawBox
 
 	#LOAD ARGUMENTS
 	la		$a0, seqArray		#Load address of seeqArray into $a0
