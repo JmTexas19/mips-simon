@@ -26,8 +26,6 @@
 				.word	0xffff00	#Green-Red
 				.word	0xffffff	#White
 	
-	
-	
 .text
 main:
 	#LOAD ARGUMENTS
@@ -291,9 +289,33 @@ userCheck:
 	fail:
 	li		$v0, 0			#Set return to 0 (LOSE)
 	jr		$ra			#Return
+
+#Procedure: drawDot:
+#Draw a dot on the bitmap display
+#$a0 = x coordinate (0-31)
+#$a1 = y coordinate (0-31)	
+#$a2 = colour number (0-7)
+drawDot:
+	#MAKE ROOM ON STACK
+	addi		$sp, $sp, -8		#Make room on stack for 2 words
+	sw		$ra, 4($sp)		#Store $ra on element 1 of stack
+	sw		$a2, 0($sp)		#Store $a2 on element 0 of stack
 	
+	#CALCULATE ADDRESS
+	jal		calculateAddress	#returns address of pixel in $v0
+	lw		$a2, 0($sp)		#Restore $a2 from stack
+	sw		$v0, 0($sp)		#Save $v0 on element 0 of stack
 	
+	#GET COLOR
+	jal		getColour		#Returns colour in $v1
+	lw		$v0, 0($sp)		#Restores $v0 from stack
 	
+	#MAKE DOT AND RESTORE $RA
+	sw		$v1, 0($v0)		#Make dot
+	lw		$ra, 4($sp)		#Restore $ra from stack
+	addi		$sp, $sp, 8		#Readjust stack
+	
+	jr		$ra			#Return
 	
 	
 	
