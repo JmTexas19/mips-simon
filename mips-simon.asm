@@ -39,9 +39,9 @@ main:
 	#DRAW A LINE
 	la		$a0, 0
 	la		$a1, 0
-	la		$a2, 2
-	la		$a3, 32
-	jal		drawVertLine
+	la		$a2, 3
+	la		$a3, 10
+	jal		drawBox
 
 	#LOAD ARGUMENTS
 	la		$a0, seqArray		#Load address of seeqArray into $a0
@@ -398,7 +398,7 @@ drawHorzLine:
 #$a0 = x coordinate (0-31)
 #$a1 = y coordinate (0-31)
 #$a2 = colour number (0-7)
-#$a3 = length of the line
+#$a3 = length of the line (1-32)
 drawVertLine:
 	#MAKE ROOM ON STACK AND SAVE REGISTERS
 	addi		$sp, $sp, -16		#Make room on stack for 4 words
@@ -416,8 +416,8 @@ drawVertLine:
 	lw		$a2, 8($sp)		#Restore $a2 from stack
 	
 	#INCREMENT VALUES
-	addi		$a1, $a1, 1		#Increment x by 1
-	sw		$a1, 4($sp)		#Store $a0 on element 0 of stack
+	addi		$a1, $a1, 1		#Increment y by 1
+	sw		$a1, 4($sp)		#Store $a1 on element 1 of stack
 	addi		$a3, $a3, -1		#Decrement length of line
 	bne		$a3, $0, vertLoop	#If length is not 0, loop
 	
@@ -427,6 +427,50 @@ drawVertLine:
 	
 	jr		$ra			#Return
 
-
+#Procedure: drawBox:
+#Draw a box on the bitmap display
+#$a0 = x coordinate (0-31)
+#$a1 = y coordinate (0-31)
+#$a2 = colour number (0-7)
+#$a3 = size of box (1-32)
+drawBox:
+	#MAKE ROOM ON STACK AND SAVE REGISTERS
+	addi		$sp, $sp, -20		#Make room on stack for 4 words
+	sw		$ra, 12($sp)		#Store $ra on element 4 of stack
+	sw		$a0, 0($sp)		#Store $a0 on element 0 of stack
+	sw		$a2, 8($sp)		#Store $a2 on element 2 of stack
+	move		$s0, $a3		#Copy $a3 to temp register
+	sw		$s0, 16($sp)		#Store $s0 on element 5 of stack
+	
+	boxLoop:
+	jal 		drawHorzLine		#Jump and link to drawHorzLine
+	
+	#RESTORE REGISTERS
+	lw		$a0, 0($sp)		#Restore $a0 from stack
+	lw		$a1, 4($sp)		#Restore $a1 from stack
+	lw		$a2, 8($sp)		#Restore $a2 from stack
+	lw		$s0, 16($sp)		#Restore $s0 from stack
+	
+	#INCREMENT VALUES
+	addi		$a1, $a1, 1		#Increment y by 1
+	sw		$a1, 4($sp)		#Store $a1 on element 1 of stack
+	addi		$s0, $s0, -1		#Decrement counter
+	sw		$s0, 16($sp)		#Store $s0 on element 5 of stack
+	bne		$s0, $0, boxLoop	#If length is not 0, loop
+	
+	#RESTORE $RA
+	lw		$ra, 12($sp)		#Restore $ra from stack
+	addi		$sp, $sp, 20		#Readjust stack
+	addi		$s0, $s0, 0		#Reset $s0
+	
+	jr		$ra			#Return
+	
+	
+	
+	
+	
+	
+	
+	
 
 
