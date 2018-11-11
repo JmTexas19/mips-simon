@@ -682,22 +682,57 @@ drawCircle:
 	sw		$ra, 0($sp)		#Store $ra on element 4 of stack
 
 	#VARIABLES
-	lw		$t0, 0($a0)		#x0
-	lw		$t1, 0($a1)		#y0
-	lw		$t2, 0($a2)		#radius
-	addi		$t3, $t2, -1		#x
-	li		$t4, 0			#y
-	li		$t5, 1			#dx
-	li		$t6, 1			#dy
-	li		$t7, 0			#Err
+	lw		$t0, 0($a0)			#x0
+	lw		$t1, 0($a1)			#y0
+	lw		$t2, 0($a2)			#radius
+	addi		$t3, $t2, -1			#x
+	li		$t4, 0				#y
+	li		$t5, 1				#dx
+	li		$t6, 1				#dy
+	li		$t7, 0				#Err
 	
 	#CALCULATE ERR (dx - (radius << 1))
-	sll		$t8, $t2, 1		#Bitshift radius left 1	
-	subu		$t7, $t5, $t8		#Subtract dx - shifted radius 
+	sll		$t8, $t2, 1			#Bitshift radius left 1	
+	subu		$t7, $t5, $t8			#Subtract dx - shifted radius 
 	
+	#While(x >= y)
 	circleLoop:
+	blt 		 $t4, $t3, skipCircleLoop	#If x < y, skip circleLoop
+	
+	#Draw Dot (x0 + x, y0 + y)
+	
+        #Draw Dot (x0 + y, y0 + x)
+        
+        #Draw Dot (x0 - y, y0 + x)
+        
+        #Draw Dot (x0 - x, y0 + y)
+        
+        #Draw Dot (x0 - x, y0 - y)
+        
+        #Draw Dot (x0 - y, y0 - x)
+        
+        #Draw Dot (x0 + y, y0 - x)
+        
+        #Draw Dot (x0 + x, y0 - y)
+	
+	#If (err <= 0)
+	bgtz 		$t7, doElse
+	addi		$t4, $t4, 1		#Increment y
+	
+	j		circleContinue		#Skip else stmt
+	
+	#Else If (err > 0)
+	doElse:
 	
 	
+	circleContinue:
+	#LOOP
+	j		circleLoop
+	
+	#CONTINUE
+	skipCircleLoop:		
+	
+
 	
 	
 	
