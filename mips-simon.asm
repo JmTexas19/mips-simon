@@ -697,25 +697,50 @@ drawCircle:
 	sll		$t8, $t2, 1			#Bitshift radius left 1	
 	subu		$t7, $t5, $t8			#Subtract dx - shifted radius 
 	
+	li		$a2, 1				#Hardcode circle color
 	#While(x >= y)
 	circleLoop:
-	blt 		 $t4, $t3, skipCircleLoop	#If x < y, skip circleLoop
+	blt 		$t4, $t3, skipCircleLoop	#If x < y, skip circleLoop
 	
 	#Draw Dot (x0 + x, y0 + y)
+	addu		$a0, $t0, $t3
+	addu		$a1, $t1, $t4
+	jal		drawDot				#Jump to drawDot
 	
         #Draw Dot (x0 + y, y0 + x)
-        
+        addu		$a0, $t0, $t4
+	subu		$a1, $t1, $t3
+	jal		drawDot				#Jump to drawDot
+	
         #Draw Dot (x0 - y, y0 + x)
-        
+        subu		$a0, $t0, $t4
+	addu		$a1, $t1, $t3
+	jal		drawDot				#Jump to drawDot
+	
         #Draw Dot (x0 - x, y0 + y)
-        
+        subu		$a0, $t0, $t3
+	addu		$a1, $t1, $t4
+	jal		drawDot				#Jump to drawDot
+	
         #Draw Dot (x0 - x, y0 - y)
-        
+        subu		$a0, $t0, $t3
+	subu		$a1, $t1, $t4
+	jal		drawDot				#Jump to drawDot
+	
         #Draw Dot (x0 - y, y0 - x)
-        
+        subu		$a0, $t0, $t4
+	subu		$a1, $t1, $t3
+	jal		drawDot				#Jump to drawDot
+	
         #Draw Dot (x0 + y, y0 - x)
-        
+        addu		$a0, $t0, $t4
+	subu		$a1, $t1, $t3
+	jal		drawDot				#Jump to drawDot
+	
         #Draw Dot (x0 + x, y0 - y)
+	addu		$a0, $t0, $t3
+	subu		$a1, $t1, $t4
+	jal		drawDot				#Jump to drawDot
 	
 	#If (err <= 0)
 	bgtz 		$t7, doElse
