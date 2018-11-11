@@ -340,14 +340,15 @@ addToSeq:
 #$a1 pointer to max
 displaySeq:
 	#MAKE ROOM ON STACK AND SAVE REGISTERS
-	addi		$sp, $sp, -8		#Make room on stack for 4 words
+	addi		$sp, $sp, -12		#Make room on stack for 4 words
 	sw		$ra, 0($sp)		#Store $ra on element 0 of stack
 	sw		$a0, 4($sp)		#Store $a0 on element 1 of stack
-	lw		$s3, 0($a1)		#Load word of max into $t0
+	sw		$a1, 8($sp)		#Store $a1 on element 2 of stack
+	lw		$s3, 0($a1)		#Load word of max into $s3
 	
 	#FOR LOOP FOR GOING THROUGH SEQUENCE ONE BY ONE
 	li		$s2, 2			#Counter for going through loop one by one number of elements to display [counter 2]
-	move		$t5, $a0		#Save pointer to first element in sequence in $t5
+	move		$s5, $a0		#Save pointer to first element in sequence in $s5
 	lw		$t1, 0($a1)		#Load word of max from $a1
 	forLoop:	
 	beqz  		$s1, displayUserCheckSkip	#If counter 1 is equal to 0, skip userCheck
@@ -355,15 +356,20 @@ displaySeq:
 	#RESET ADDRESSES
 	li		$a0, 0			#Reset $a0
 	li		$a1, 0			#Reset $a1
-	move		$a0, $t5		#Reset $a0 address
-	la		$a1, 4($sp)		#Reset $a1 address
+	lw		$a0, 4($sp)		#Reset $a0 address
+	lw		$a1, 8($sp)		#Reset $a0 address
 	
 	#USER CHECK
 	addi		$s2, $s2, 1		#Increment counter 2 by 1
 	sw		$s2, 0($a1)		#Store new max into label
 	jal		userCheck		#Jump and link to user check
-	move		$t1, $s2		#Load word of max from $a1
-	move		$a0, $t5		#Reset $a0 address
+	
+	#RESET
+	li		$a0, 0			#Reset $a0
+	li		$a1, 0			#Reset $a1
+	lw		$s5, 4($sp)		#Reset $s5
+	lw		$a0, 4($sp)		#Reset $a0 address
+	move		$t1, $s2		#Load word of max from $s2
 	
 	#CHECK IF DONE
 	beq 		$s2, $s3, displayDone	#If loop does not equal max, branch
@@ -372,7 +378,7 @@ displaySeq:
 	li		$a0, 1200		#Sleep for 800ms
 	li		$v0, 32			#Load syscall for sleep
 	syscall					#Execute
-	move		$a0, $t5		#Reset $a0 address
+	move		$a0, $s5		#Reset $a0 address
 
 	displayUserCheckSkip:
 	#BLINK EACH NUM IN SEQUENCE
@@ -382,6 +388,7 @@ displaySeq:
 	
 	#CLEAR DISPLAY
 	jal		clearDisplay		#Clear Display
+	move		$t2, $s5		#Load sequence
 	
 	#LOAD ELEMENT
 	blinkLoop:	
@@ -389,11 +396,13 @@ displaySeq:
 	move		$a0, $t3		#Copy num to blink
 	li		$a1, 700		#Reset $a1
 	jal		blinkNum
+	move		$t2, $s5		#Load sequence
 		
 	returnLoop:				#Return from blink
 	#INCREMENT AND CHECK
 	addi		$t2, $t2, 4		#Increment to next element in sequence
 	addi		$s1, $s1, 1		#Increment counter by 1		
+	move		$s5, $t2		#Set $s5
 	
 	#PAUSE
 	li		$a0, 800		#Sleep for 800ms
@@ -417,13 +426,14 @@ displaySeq:
 #$a1 pointer to max
 userCheck:
 	#MAKE ROOM ON STACK AND SAVE REGISTERS
-	addi		$sp, $sp, -8		#Make room on stack for 4 words
+	addi		$sp, $sp, -12		#Make room on stack for 4 words
 	sw		$ra, 0($sp)		#Store $ra on element 0 of stack
 	sw		$a1, 4($sp)		#Store max on element 1 of stack
+	sw		$a0, 8($sp)		#Store max on element 2 of stack
 	
 	#BLINK EACH NUM IN SEQUENCE
 	li		$s4, 0			#Counter
-	move		$t2, $a0		#Copy address of sequence to $t2
+	move		$s6, $a0		#Copy address of sequence to $t2
 	
 	userCheckLoop:	
 	#GET USER INPUT
@@ -431,11 +441,11 @@ userCheck:
 	
 	#CHECK IF CORRECT
 	addi		$v0, $v0, -48		#Convert ascii to decimal
-	lw		$a0, 0($t2)		#Get element from sequence
+	lw		$a0, 0($s6)		#Get element from sequence
 	bne		$v0, $a0, fail		#Check if user input is correct
 	
 	#INCREMENT AND CHECK
-	addi		$t2, $t2, 4		#Increment to next element
+	addi		$s6, $s6, 4		#Increment to next element
 	addi		$s4, $s4, 1		#Increment counter by 1
 	
 	#BLINK AND LOOP
@@ -448,7 +458,7 @@ userCheck:
 	
 	#RESTORE $RA
 	lw		$ra, 0($sp)		#Restore $ra from stack
-	addi		$sp, $sp, 8		#Readjust stack
+	addi		$sp, $sp, 12		#Readjust stack
 	jr		$ra			#Return
 	
 	fail:
@@ -467,10 +477,10 @@ userCheck:
 	
 	#IF USER FAILS
 	#PLAY FAILURE
-	lw		$a0, 0($t2)		#Get element from sequence
+	lw		$a0, 0($s6)		#Get element from sequence
 	li		$a1, 200		#Delay
 	jal		blinkNum		#Jump and link to blinkNum
-	lw		$a0, 0($t2)		#Get element from sequence
+	lw		$a0, 0($s6)		#Get element from sequence
 	li		$a1, 200		#Delay
 	jal		blinkNum		#Jump and link to blinkNum	
 	
@@ -675,8 +685,6 @@ blinkNum:
 	addi		$sp, $sp, -8		#Make room on stack for 2 words
 	sw		$ra, 0($sp)		#Store $ra on element 0 of stack
 	sw		$a1, 4($sp)		#Store $a1 on element 1 of stack
-	
-	
 
 	#BRANCH
 	beq		$a0, 1, playBlue	#BLUE
@@ -696,11 +704,14 @@ blinkNum:
 	syscall					#Execute
 	
 	#DRAW
-	la		$a0, 8			#x = 1
-	la		$a1, 8			#y = 1
+	la		$a0, 64			#x = 1
+	la		$a1, 64			#y = 1
 	la		$a2, 1			#colour = 1
-	la		$a3, 112		#square size = 14
-	jal		drawBox			#Jump and link to drawBox
+	la		$a3, 64			#square size = 14
+	blueFillLoop2:
+	jal		drawCircle		#Jump and link to drawCircle
+	addi		$a3, $a3, -1		#Decrement radius
+	bnez		$a3, blueFillLoop2	#If a3 is not 0, branch
 
 	#PAUSE
 	lw		$a0, 4($sp)		#delay
@@ -708,11 +719,14 @@ blinkNum:
 	syscall					#Execute
 	
 	#BLINK
-	la		$a0, 8			#x = 1
-	la		$a1, 8			#y = 1
-	la		$a2, 0			#colour = 0
-	la		$a3, 112		#square size = 14
-	jal		drawBox			#Jump and link to drawBox
+	la		$a0, 64			#x = 1
+	la		$a1, 64			#y = 1
+	la		$a2, 0			#colour = 1
+	la		$a3, 64			#square size = 14
+	blueFillLoop3:
+	jal		drawCircle		#Jump and link to drawCircle
+	addi		$a3, $a3, -1		#Decrement radius
+	bnez		$a3, blueFillLoop3	#If a3 is not 0, branch
 	
 	#PAUSE
 	lw		$a0, 4($sp)		#delay
@@ -720,11 +734,14 @@ blinkNum:
 	syscall					#Execute
 	
 	#BLINK
-	la		$a0, 8			#x = 1
-	la		$a1, 8			#y = 1
-	la		$a2, 0			#colour = 0
-	la		$a3, 112			#square size = 14
-	jal		drawBox			#Jump and link to drawBox
+	la		$a0, 64			#x = 1
+	la		$a1, 64			#y = 1
+	la		$a2, 0			#colour = 1
+	la		$a3, 64			#square size = 14
+	blueFillLoop4:
+	jal		drawCircle		#Jump and link to drawCircle
+	addi		$a3, $a3, -1		#Decrement radius
+	bnez		$a3, blueFillLoop4	#If a3 is not 0, branch
 	j		continueUserCheck
 	
 	#BLINK GREEN
@@ -738,12 +755,14 @@ blinkNum:
 	syscall					#Execute
 	
 	#DRAW
-	blinkCGreen:
-	la		$a0, 8			#x = 1
-	la		$a1, 136		#y = 17
-	la		$a2, 2			#colour = 2
-	la		$a3, 112		#square size = 14
-	jal		drawBox			#Jump and link to drawBox
+	la		$a0, 192		#x = 1
+	la		$a1, 64			#y = 1
+	la		$a2, 2			#colour = 1
+	la		$a3, 64			#square size = 14
+	greenFillLoop2:
+	jal		drawCircle		#Jump and link to drawCircle
+	addi		$a3, $a3, -1		#Decrement radius
+	bnez		$a3, greenFillLoop2	#If a3 is not 0, branch
 
 	#PAUSE
 	lw		$a0, 4($sp)		#delay
@@ -751,11 +770,14 @@ blinkNum:
 	syscall					#Execute
 	
 	#BLINK
-	la		$a0, 8			#x = 1
-	la		$a1, 136		#y = 17
-	la		$a2, 0			#colour = 0
-	la		$a3, 112		#square size = 14
-	jal		drawBox			#Jump and link to drawBox
+	la		$a0, 192		#x = 1
+	la		$a1, 64			#y = 1
+	la		$a2, 0			#colour = 1
+	la		$a3, 64			#square size = 14
+	greenFillLoop3:
+	jal		drawCircle		#Jump and link to drawCircle
+	addi		$a3, $a3, -1		#Decrement radius
+	bnez		$a3, greenFillLoop3	#If a3 is not 0, branch
 	
 	#PAUSE
 	lw		$a0, 4($sp)		#delay
@@ -763,11 +785,14 @@ blinkNum:
 	syscall					#Execute
 	
 	#BLINK
-	la		$a0, 8			#x = 1
-	la		$a1, 136		#y = 17
-	la		$a2, 0			#colour = 0
-	la		$a3, 112		#square size = 14
-	jal		drawBox			#Jump and link to drawBox
+	la		$a0, 192		#x = 1
+	la		$a1, 64			#y = 1
+	la		$a2, 0			#colour = 1
+	la		$a3, 64			#square size = 14
+	greenFillLoop4:
+	jal		drawCircle		#Jump and link to drawCircle
+	addi		$a3, $a3, -1		#Decrement radius
+	bnez		$a3, greenFillLoop4	#If a3 is not 0, branch
 	j		continueUserCheck
 	
 	#BLINK RED
@@ -782,11 +807,14 @@ blinkNum:
 	
 	#DRAW
 	blinkCRed:
-	la		$a0, 136		#x = 17
-	la		$a1, 8			#y = 1
-	la		$a2, 3			#colour = 3
-	la		$a3, 112		#square size = 14
-	jal		drawBox			#Jump and link to drawBox
+	la		$a0, 64			#x = 1
+	la		$a1, 192		#y = 1
+	la		$a2, 3			#colour = 1
+	la		$a3, 64			#square size = 14
+	redFillLoop2:
+	jal		drawCircle		#Jump and link to drawCircle
+	addi		$a3, $a3, -1		#Decrement radius
+	bnez		$a3, redFillLoop2	#If a3 is not 0, branch
 
 	#PAUSE
 	lw		$a0, 4($sp)		#delay
@@ -794,11 +822,14 @@ blinkNum:
 	syscall					#Execute
 	
 	#BLINK
-	la		$a0, 136		#x = 17
-	la		$a1, 8			#y = 1
-	la		$a2, 0			#colour = 0
-	la		$a3, 112		#square size = 14
-	jal		drawBox			#Jump and link to drawBoxS
+	la		$a0, 64			#x = 1
+	la		$a1, 192		#y = 1
+	la		$a2, 0			#colour = 1
+	la		$a3, 64			#square size = 14
+	redFillLoop3:
+	jal		drawCircle		#Jump and link to drawCircle
+	addi		$a3, $a3, -1		#Decrement radius
+	bnez		$a3, redFillLoop3	#If a3 is not 0, branch
 	
 	#PAUSE
 	lw		$a0, 4($sp)		#delay
@@ -806,11 +837,15 @@ blinkNum:
 	syscall					#Execute
 	
 	#BLINK
-	la		$a0, 136		#x = 17
-	la		$a1, 8			#y = 1
-	la		$a2, 0			#colour = 0
-	la		$a3, 112		#square size = 14
-	jal		drawBox			#Jump and link to drawBoxS
+	la		$a0, 64			#x = 1
+	la		$a1, 192		#y = 1
+	la		$a2, 0			#colour = 1
+	la		$a3, 64			#square size = 14
+	redFillLoop4:
+	jal		drawCircle		#Jump and link to drawCircle
+	addi		$a3, $a3, -1		#Decrement radius
+	bnez		$a3, redFillLoop4	#If a3 is not 0, branch
+	
 	j		continueUserCheck
 	
 	#BLINK MAGENTA
@@ -825,11 +860,14 @@ blinkNum:
 	
 	#DRAW
 	blinkCMagenta:
-	la		$a0, 136		#x = 17
-	la		$a1, 136		#y = 17
-	la		$a2, 5			#colour = 5
-	la		$a3, 112		#square size = 14
-	jal		drawBox			#Jump and link to drawBox
+	la		$a0, 192		#x = 1
+	la		$a1, 192		#y = 1
+	la		$a2, 5			#colour = 1
+	la		$a3, 64			#square size = 14
+	magentaFillLoop2:
+	jal		drawCircle		#Jump and link to drawCircle
+	addi		$a3, $a3, -1		#Decrement radius
+	bnez		$a3, magentaFillLoop2	#If a3 is not 0, branch
 
 	#PAUSE
 	lw		$a0, 4($sp)		#delay
@@ -837,11 +875,14 @@ blinkNum:
 	syscall					#Execute
 	
 	#BLINK
-	la		$a0, 136		#x = 17
-	la		$a1, 136		#y = 17
-	la		$a2, 0			#colour = 0
-	la		$a3, 112		#square size = 14
-	jal		drawBox			#Jump and link to drawBox
+	la		$a0, 192		#x = 1
+	la		$a1, 192		#y = 1
+	la		$a2, 0			#colour = 1
+	la		$a3, 64			#square size = 14
+	magentaFillLoop3:
+	jal		drawCircle		#Jump and link to drawCircle
+	addi		$a3, $a3, -1		#Decrement radius
+	bnez		$a3, magentaFillLoop3	#If a3 is not 0, branch
 	
 	#PAUSE
 	lw		$a0, 4($sp)		#delay
@@ -849,11 +890,14 @@ blinkNum:
 	syscall					#Execute
 	
 	#BLINK
-	la		$a0, 136		#x = 17
-	la		$a1, 136		#y = 17
-	la		$a2, 0			#colour = 0
-	la		$a3, 112		#square size = 14
-	jal		drawBox			#Jump and link to drawBox
+	la		$a0, 192		#x = 1
+	la		$a1, 192		#y = 1
+	la		$a2, 0			#colour = 1
+	la		$a3, 64			#square size = 14
+	magentaFillLoop4:
+	jal		drawCircle		#Jump and link to drawCircle
+	addi		$a3, $a3, -1		#Decrement radius
+	bnez		$a3, magentaFillLoop4	#If a3 is not 0, branch
 	j		continueUserCheck
 		
 	continueUserCheck:
@@ -868,7 +912,7 @@ getChar:
 	#MAKE ROOM ON STACK AND SAVE REGISTERS
 	addi		$sp, $sp, -4		#Make room on stack for 1 words
 	sw		$ra, 0($sp)		#Store $ra on element 0 of stack
-	li		$s3, 0			#Counter
+	li		$s7, 0			#Counter
 	j		check			#Skip first sleep
 	
 	charLoop:
@@ -880,8 +924,8 @@ getChar:
 	#POLLING
 	check:
 	jal		isCharThere		#Jump and link to isCharThere
-	addi		$s3, $s3, 1		#Increment $s3
-	beq		$s3, 10, leaveChar	#If 5 seconds have passed, leave
+	addi		$s7, $s7, 1		#Increment $s3
+	beq		$s7, 10, leaveChar	#If 5 seconds have passed, leave
 	beqz  		$v0, charLoop		#If there is input, finish polling, else loop
 	
 	leaveChar:
