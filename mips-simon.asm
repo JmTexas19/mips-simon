@@ -44,12 +44,28 @@ main:
 	la		$a3, 14			#square size = 14
 	jal		drawBox			#Jump and link to drawBox
 	
+	#PLAY TONE BLUE
+	li		$a0, 60			#Pitch
+	li		$a1, 4000		#Duration
+	li		$a2, 0			#Instrument
+	li		$a3, 127		#Volume
+	li		$v0, 31			#Load syscall
+	syscall					#Execute
+	
 	#DRAW GREEN SQUARE
 	la		$a0, 1			#x = 1
 	la		$a1, 17			#y = 17
 	la		$a2, 2			#colour = 2
 	la		$a3, 14			#square size = 14
 	jal		drawBox			#Jump and link to drawBox
+	
+	#PLAY TONE GREEN
+	li		$a0, 65			#Pitch
+	li		$a1, 4000		#Duration
+	li		$a2, 0			#Instrument
+	li		$a3, 127		#Volume
+	li		$v0, 31			#Load syscall
+	syscall					#Execute
 	
 	#DRAW RED SQUARE
 	la		$a0, 17			#x = 17
@@ -58,12 +74,28 @@ main:
 	la		$a3, 14			#square size = 14
 	jal		drawBox			#Jump and link to drawBox
 	
+	#PLAY TONE RED
+	li		$a0, 70			#Pitch
+	li		$a1, 4000		#Duration
+	li		$a2, 0			#Instrument
+	li		$a3, 127		#Volume
+	li		$v0, 31			#Load syscall
+	syscall					#Execute
+	
 	#DRAW MAGENTA SQUARE
 	la		$a0, 17			#x = 17
 	la		$a1, 17			#y = 17
 	la		$a2, 5			#colour = 5
 	la		$a3, 14			#square size = 14
 	jal		drawBox			#Jump and link to drawBox
+	
+	#PLAY TONE MAGENTA
+	li		$a0, 75			#Pitch
+	li		$a1, 4000		#Duration
+	li		$a2, 0			#Instrument
+	li		$a3, 127		#Volume
+	li		$v0, 31			#Load syscall
+	syscall					#Execute
 
 	#LOAD ARGUMENTS
 	la		$a0, seqArray		#Load address of seeqArray into $a0
