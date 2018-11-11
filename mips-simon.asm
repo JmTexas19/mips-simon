@@ -678,8 +678,10 @@ clearDisplay:
 #a2 = pointer to radius
 drawCircle:
 	#MAKE ROOM ON STACK
-	addi		$sp, $sp, -4		#Make room on stack for 1 words
-	sw		$ra, 0($sp)		#Store $ra on element 4 of stack
+	addi		$sp, $sp, -12		#Make room on stack for 1 words
+	sw		$ra, 0($sp)		#Store $ra on element 0 of stack
+	sw		$a0, 4($sp)		#Store $a0 on element 1 of stack
+	sw		$a1, 8($sp)		#Store $a1 on element 2 of stack
 
 	#VARIABLES
 	lw		$t0, 0($a0)			#x0
@@ -718,12 +720,17 @@ drawCircle:
 	#If (err <= 0)
 	bgtz 		$t7, doElse
 	addi		$t4, $t4, 1		#Increment y
-	
+	addu		$t7, $t7, $t6		#err += dy
+	addi		$t6, $t6, 2		#dy += 2
 	j		circleContinue		#Skip else stmt
 	
 	#Else If (err > 0)
 	doElse:
-	
+	addi		$t3, $t3, -1		#x--
+	addi		$t5, $t5, 2		#dx += 2
+	sll		$t8, $t2, 1		#Bitshift radius left 1	
+	subu		$t9, $t5, $t8		#Subtract dx - shifted radius 
+	addu		$t7, $t7, $t9		#err += $t9
 	
 	circleContinue:
 	#LOOP
@@ -731,6 +738,10 @@ drawCircle:
 	
 	#CONTINUE
 	skipCircleLoop:		
+	
+	#RESTORE $RA
+	lw		$ra, 0($sp)		#Restore $ra from stack
+	addi		$sp, $sp, 4		#Readjust stack
 	
 
 	
