@@ -37,6 +37,15 @@ main:
 	#STACK
 	la		$sp, stack_end
 
+	#DRAW BLUE CIRCLE
+	la		$a0, 128			#x = 1
+	la		$a1, 128			#y = 1
+	la		$a2, 2			#colour = 1
+	la		$a3, 64		#square size = 14
+	jal		drawCircle		#Jump and link to drawBox
+	
+	j		exit
+
 	#DRAW BLUE SQUARE
 	la		$a0, 1			#x = 1
 	la		$a1, 1			#y = 1
@@ -492,8 +501,9 @@ userCheck:
 drawDot:
 	#MAKE ROOM ON STACK
 	addi		$sp, $sp, -8		#Make room on stack for 2 words
-	sw		$ra, 4($sp)		#Store $ra on element 1 of stack
 	sw		$a2, 0($sp)		#Store $a2 on element 0 of stack
+	sw		$ra, 4($sp)		#Store $ra on element 1 of stack
+
 	
 	#CALCULATE ADDRESS
 	jal		calculateAddress	#returns address of pixel in $v0
@@ -531,9 +541,9 @@ calculateAddress:
 #$a2 = colour number (0-7)
 getColour:
 	#GET COLOUR	
-	la		$t0, colourTable	#Load Base
+	la		$a0, colourTable	#Load Base
 	sll		$a2, $a2, 2		#Index x4 is offset
-	add		$a2, $a2, $t0		#Address is base + offset
+	add		$a2, $a2, $a0		#Address is base + offset
 	lw		$v1, 0($a2)		#Get actual color from memory
 
 	jr		$ra			#Return
@@ -673,20 +683,23 @@ clearDisplay:
 #Procedure: drawCircle:
 #Draw a circle in the center of the input pixel (This will be implemented using the 
 #midpoint circle algorithm from https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
-#a0 = pointer to x0
-#a1 = pointer to y0
-#a2 = pointer to radius
+#a0 = x0
+#a1 = y0
+#a2 = color
+#a3 = radius
 drawCircle:
 	#MAKE ROOM ON STACK
-	addi		$sp, $sp, -12		#Make room on stack for 1 words
+	addi		$sp, $sp, -20		#Make room on stack for 1 words
 	sw		$ra, 0($sp)		#Store $ra on element 0 of stack
 	sw		$a0, 4($sp)		#Store $a0 on element 1 of stack
 	sw		$a1, 8($sp)		#Store $a1 on element 2 of stack
+	sw		$a2, 12($sp)		#Store $a1 on element 3 of stack
+	sw		$a3, 16($sp)		#Store $a1 on element 4 of stack
 
 	#VARIABLES
-	lw		$t0, 0($a0)			#x0
-	lw		$t1, 0($a1)			#y0
-	lw		$t2, 0($a2)			#radius
+	move		$t0, $a0			#x0
+	move		$t1, $a1			#y0
+	move		$t2, $a3			#radius
 	addi		$t3, $t2, -1			#x
 	li		$t4, 0				#y
 	li		$t5, 1				#dx
@@ -697,54 +710,61 @@ drawCircle:
 	sll		$t8, $t2, 1			#Bitshift radius left 1	
 	subu		$t7, $t5, $t8			#Subtract dx - shifted radius 
 	
-	li		$a2, 1				#Hardcode circle color
 	#While(x >= y)
 	circleLoop:
-	blt 		$t4, $t3, skipCircleLoop	#If x < y, skip circleLoop
+	blt 		$t3, $t4, skipCircleLoop	#If x < y, skip circleLoop
 	
 	#Draw Dot (x0 + x, y0 + y)
 	addu		$a0, $t0, $t3
 	addu		$a1, $t1, $t4
+	lw		$a2, 12($sp)
 	jal		drawDot				#Jump to drawDot
 	
         #Draw Dot (x0 + y, y0 + x)
         addu		$a0, $t0, $t4
-	subu		$a1, $t1, $t3
+	addu		$a1, $t1, $t3
+	lw		$a2, 12($sp)
 	jal		drawDot				#Jump to drawDot
 	
         #Draw Dot (x0 - y, y0 + x)
         subu		$a0, $t0, $t4
 	addu		$a1, $t1, $t3
+	lw		$a2, 12($sp)
 	jal		drawDot				#Jump to drawDot
 	
         #Draw Dot (x0 - x, y0 + y)
         subu		$a0, $t0, $t3
 	addu		$a1, $t1, $t4
+	lw		$a2, 12($sp)
 	jal		drawDot				#Jump to drawDot
 	
         #Draw Dot (x0 - x, y0 - y)
         subu		$a0, $t0, $t3
 	subu		$a1, $t1, $t4
+	lw		$a2, 12($sp)
 	jal		drawDot				#Jump to drawDot
 	
         #Draw Dot (x0 - y, y0 - x)
         subu		$a0, $t0, $t4
 	subu		$a1, $t1, $t3
+	lw		$a2, 12($sp)
 	jal		drawDot				#Jump to drawDot
 	
         #Draw Dot (x0 + y, y0 - x)
         addu		$a0, $t0, $t4
 	subu		$a1, $t1, $t3
+	lw		$a2, 12($sp)
 	jal		drawDot				#Jump to drawDot
 	
         #Draw Dot (x0 + x, y0 - y)
 	addu		$a0, $t0, $t3
 	subu		$a1, $t1, $t4
+	lw		$a2, 12($sp)
 	jal		drawDot				#Jump to drawDot
 	
 	#If (err <= 0)
 	bgtz 		$t7, doElse
-	addi		$t4, $t4, 1		#Increment y
+	addi		$t4, $t4, 1		#y++
 	addu		$t7, $t7, $t6		#err += dy
 	addi		$t6, $t6, 2		#dy += 2
 	j		circleContinue		#Skip else stmt
@@ -766,7 +786,7 @@ drawCircle:
 	
 	#RESTORE $RA
 	lw		$ra, 0($sp)		#Restore $ra from stack
-	addi		$sp, $sp, 4		#Readjust stack
+	addi		$sp, $sp, 20		#Readjust stack
 	
 
 	
