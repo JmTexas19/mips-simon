@@ -38,10 +38,10 @@ main:
 	la		$sp, stack_end
 
 	#DRAW BLUE SQUARE
-	la		$a0, 1			#x = 1
-	la		$a1, 1			#y = 1
+	la		$a0, 8			#x = 1
+	la		$a1, 8			#y = 1
 	la		$a2, 1			#colour = 1
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBox
 	
 	#PLAY TONE BLUE
@@ -53,10 +53,10 @@ main:
 	syscall					#Execute
 	
 	#DRAW GREEN SQUARE
-	la		$a0, 1			#x = 1
-	la		$a1, 17			#y = 17
+	la		$a0, 8			#x = 1
+	la		$a1, 136		#y = 17
 	la		$a2, 2			#colour = 2
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBox
 	
 	#PLAY TONE GREEN
@@ -68,10 +68,10 @@ main:
 	syscall					#Execute
 	
 	#DRAW RED SQUARE
-	la		$a0, 17			#x = 17
-	la		$a1, 1			#y = 1
+	la		$a0, 136		#x = 17
+	la		$a1, 8			#y = 1
 	la		$a2, 3			#colour = 3
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBox
 	
 	#PLAY TONE RED
@@ -83,10 +83,10 @@ main:
 	syscall					#Execute
 	
 	#DRAW MAGENTA SQUARE
-	la		$a0, 17			#x = 17
-	la		$a1, 17			#y = 17
+	la		$a0, 136		#x = 17
+	la		$a1, 136		#y = 17
 	la		$a2, 5			#colour = 5
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBox
 	
 	#PLAY TONE MAGENTA
@@ -501,8 +501,8 @@ drawDot:
 calculateAddress:
 	#CALCULATIONS
 	sll		$a0, $a0, 2		#Multiply $a0 by 4
-	sll		$a1, $a1, 5		#Multiply $a1 by 32
-	sll		$a1, $a1, 2		#Multiply $a1 by 4
+	sll		$a1, $a1, 7		#Multiply $a1 by 256
+	sll		$a1, $a1, 3		#Multiply $a1 by 4
 	add		$a0, $a0, $a1		#Add $a1 to $a0
 	addi		$v0, $a0, 0x10040000	#Add base address for display + $a0 to $v0
 	
