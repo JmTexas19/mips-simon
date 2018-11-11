@@ -94,13 +94,13 @@ main:
 	sw		$t0, max		#Store 5 into max label	
 	j		continue		#Jump to continue
 	
-	#NORMAL MODE
+	#EASY MODE
 	normal:
 	li		$t0, 8			#Load 8 into $t0
 	sw		$t0, max		#Store 5 into max label	
 	j		continue		#Jump to continue
 	
-	#HARD MODE
+	#EASY MODE
 	hard:
 	li		$t0, 11			#Load 11 into $t0
 	sw		$t0, max		#Store 5 into max label	
