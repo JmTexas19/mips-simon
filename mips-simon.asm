@@ -769,6 +769,12 @@ blinkNum:
 	jal		drawCircle		#Jump and link to drawCircle
 	addi		$a3, $a3, -1		#Decrement radius
 	bnez		$a3, blueFillLoop2	#If a3 is not 0, branch
+	
+	#DRAW DIGIT
+	li		$a0, 59			#x 
+	li		$a1, 59			#y 
+	la		$a2, digit1
+	jal		OutText
 
 	#PAUSE
 	lw		$a0, 4($sp)		#delay
@@ -820,6 +826,12 @@ blinkNum:
 	jal		drawCircle		#Jump and link to drawCircle
 	addi		$a3, $a3, -1		#Decrement radius
 	bnez		$a3, greenFillLoop2	#If a3 is not 0, branch
+	
+	#DRAW DIGIT
+	li		$a0, 187		#x 
+	li		$a1, 59			#y 
+	la		$a2, digit2
+	jal		OutText
 
 	#PAUSE
 	lw		$a0, 4($sp)		#delay
@@ -872,6 +884,12 @@ blinkNum:
 	jal		drawCircle		#Jump and link to drawCircle
 	addi		$a3, $a3, -1		#Decrement radius
 	bnez		$a3, redFillLoop2	#If a3 is not 0, branch
+	
+	#DRAW DIGIT
+	li		$a0, 59			#x 
+	li		$a1, 187		#y 
+	la		$a2, digit3
+	jal		OutText
 
 	#PAUSE
 	lw		$a0, 4($sp)		#delay
@@ -925,6 +943,12 @@ blinkNum:
 	jal		drawCircle		#Jump and link to drawCircle
 	addi		$a3, $a3, -1		#Decrement radius
 	bnez		$a3, magentaFillLoop2	#If a3 is not 0, branch
+	
+	#DRAW DIGIT
+	li		$a0, 187		#x 
+	li		$a1, 187		#y 
+	la		$a2, digit4
+	jal		OutText
 
 	#PAUSE
 	lw		$a0, 4($sp)		#delay
