@@ -51,32 +51,64 @@ main:
 	j		exit
 
 	#DRAW BLUE SQUARE
-	la		$a0, 1			#x = 1
-	la		$a1, 1			#y = 1
+	la		$a0, 8			#x = 1
+	la		$a1, 8			#y = 1
 	la		$a2, 1			#colour = 1
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBox
+	
+	#PLAY TONE BLUE
+	li		$a0, 60			#Pitch
+	li		$a1, 4000		#Duration
+	li		$a2, 0			#Instrument
+	li		$a3, 127		#Volume
+	li		$v0, 31			#Load syscall
+	syscall					#Execute
 	
 	#DRAW GREEN SQUARE
-	la		$a0, 1			#x = 1
-	la		$a1, 17			#y = 17
+	la		$a0, 8			#x = 1
+	la		$a1, 136		#y = 17
 	la		$a2, 2			#colour = 2
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBox
+	
+	#PLAY TONE GREEN
+	li		$a0, 65			#Pitch
+	li		$a1, 4000		#Duration
+	li		$a2, 0			#Instrument
+	li		$a3, 127		#Volume
+	li		$v0, 31			#Load syscall
+	syscall					#Execute
 	
 	#DRAW RED SQUARE
-	la		$a0, 17			#x = 17
-	la		$a1, 1			#y = 1
+	la		$a0, 136		#x = 17
+	la		$a1, 8			#y = 1
 	la		$a2, 3			#colour = 3
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBox
 	
+	#PLAY TONE RED
+	li		$a0, 70			#Pitch
+	li		$a1, 4000		#Duration
+	li		$a2, 0			#Instrument
+	li		$a3, 127		#Volume
+	li		$v0, 31			#Load syscall
+	syscall					#Execute
+	
 	#DRAW MAGENTA SQUARE
-	la		$a0, 17			#x = 17
-	la		$a1, 17			#y = 17
+	la		$a0, 136		#x = 17
+	la		$a1, 136		#y = 17
 	la		$a2, 5			#colour = 5
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBox
+	
+	#PLAY TONE MAGENTA
+	li		$a0, 75			#Pitch
+	li		$a1, 4000		#Duration
+	li		$a2, 0			#Instrument
+	li		$a3, 127		#Volume
+	li		$v0, 31			#Load syscall
+	syscall					#Execute
 
 	#LOAD ARGUMENTS
 	la		$a0, seqArray		#Load address of seeqArray into $a0
@@ -311,7 +343,7 @@ displaySeq:
 	#MAKE ROOM ON STACK AND SAVE REGISTERS
 	addi		$sp, $sp, -8		#Make room on stack for 4 words
 	sw		$ra, 0($sp)		#Store $ra on element 0 of stack
-	sw		$a0, 4($sp)		#Store $ra on element 0 of stack
+	sw		$a0, 4($sp)		#Store $a0 on element 1 of stack
 	lw		$s3, 0($a1)		#Load word of max into $t0
 	
 	#FOR LOOP FOR GOING THROUGH SEQUENCE ONE BY ONE
@@ -331,10 +363,17 @@ displaySeq:
 	addi		$s2, $s2, 1		#Increment counter 2 by 1
 	sw		$s2, 0($a1)		#Store new max into label
 	jal		userCheck		#Jump and link to user check
+	move		$t1, $s2		#Load word of max from $a1
 	move		$a0, $t5		#Reset $a0 address
 	
 	#CHECK IF DONE
 	beq 		$s2, $s3, displayDone	#If loop does not equal max, branch
+	
+	#PAUSE
+	li		$a0, 1200		#Sleep for 800ms
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
+	move		$a0, $t5		#Reset $a0 address
 
 	displayUserCheckSkip:
 	#BLINK EACH NUM IN SEQUENCE
@@ -345,18 +384,17 @@ displaySeq:
 	#CLEAR DISPLAY
 	jal		clearDisplay		#Clear Display
 	
+	#LOAD ELEMENT
 	blinkLoop:	
-	#BLINK ELEMENT
-	lw		$t3, 0($t2)		#Get element from sequence
-	beq		$t3, 1, blinkBlue	#If element is 1 blink blue
-	beq		$t3, 2, blinkGreen	#If element is 2 blink green
-	beq		$t3, 3, blinkRed	#If element is 3 blink red
-	beq		$t3, 4	blinkMagenta	#If element is 4 blink magenta				
+	lw		$t3, 0($t2)		#Load element from sequence
+	move		$a0, $t3		#Copy num to blink
+	li		$a1, 700		#Reset $a1
+	jal		blinkNum
+		
 	returnLoop:				#Return from blink
-	
 	#INCREMENT AND CHECK
 	addi		$t2, $t2, 4		#Increment to next element in sequence
-	addi		$s1, $s1, 1		#Increment counter by 1
+	addi		$s1, $s1, 1		#Increment counter by 1		
 	
 	#PAUSE
 	li		$a0, 800		#Sleep for 800ms
@@ -374,108 +412,23 @@ displaySeq:
 	
 	jr		$ra			#Return
 	
-	#BLINK BLUE
-	blinkBlue:
-	#DRAW
-	la		$a0, 1			#x = 1
-	la		$a1, 1			#y = 1
-	la		$a2, 1			#colour = 1
-	la		$a3, 14			#square size = 14
-	jal		drawBox			#Jump and link to drawBox
-
-	#PAUSE
-	li		$a0, 800		#Sleep for 800ms
-	li		$v0, 32			#Load syscall for sleep
-	syscall					#Execute
-	
-	#BLINK
-	la		$a0, 1			#x = 1
-	la		$a1, 1			#y = 1
-	la		$a2, 0			#colour = 0
-	la		$a3, 14			#square size = 14
-	jal		drawBox			#Jump and link to drawBox
-	j		returnLoop		#Return back to loop
-	
-	#BLINK GREEN
-	#DRAW
-	blinkGreen:
-	la		$a0, 1			#x = 1
-	la		$a1, 17			#y = 17
-	la		$a2, 2			#colour = 2
-	la		$a3, 14			#square size = 14
-	jal		drawBox			#Jump and link to drawBox
-
-	#PAUSE
-	li		$a0, 800		#Sleep for 800ms
-	li		$v0, 32			#Load syscall for sleep
-	syscall					#Execute
-	
-	#BLINK
-	la		$a0, 1			#x = 1
-	la		$a1, 17			#y = 17
-	la		$a2, 0			#colour = 0
-	la		$a3, 14			#square size = 14
-	jal		drawBox			#Jump and link to drawBox
-	j		returnLoop		#Return back to loop
-	
-	#BLINK RED
-	#DRAW
-	blinkRed:
-	la		$a0, 17			#x = 17
-	la		$a1, 1			#y = 1
-	la		$a2, 3			#colour = 3
-	la		$a3, 14			#square size = 14
-	jal		drawBox			#Jump and link to drawBox
-
-	#PAUSE
-	li		$a0, 800		#Sleep for 800ms
-	li		$v0, 32			#Load syscall for sleep
-	syscall					#Execute
-	
-	#BLINK
-	la		$a0, 17			#x = 17
-	la		$a1, 1			#y = 1
-	la		$a2, 0			#colour = 0
-	la		$a3, 14			#square size = 14
-	jal		drawBox			#Jump and link to drawBoxS
-	j		returnLoop		#Return back to loop
-	
-	#BLINK MAGENTA
-	#DRAW
-	blinkMagenta:
-	la		$a0, 17			#x = 17
-	la		$a1, 17			#y = 17
-	la		$a2, 5			#colour = 5
-	la		$a3, 14			#square size = 14
-	jal		drawBox			#Jump and link to drawBox
-
-	#PAUSE
-	li		$a0, 800		#Sleep for 800ms
-	li		$v0, 32			#Load syscall for sleep
-	syscall					#Execute
-	
-	#BLINK
-	la		$a0, 17			#x = 17
-	la		$a1, 17			#y = 17
-	la		$a2, 0			#colour = 0
-	la		$a3, 14			#square size = 14
-	jal		drawBox			#Jump and link to drawBox
-	j		returnLoop		#Return back to loop
-	
 #Procedure: userCheck:
 #Display generated sequence to player
 #$a0 pointer to seqArray
 #$a1 pointer to max
 userCheck:
+	#MAKE ROOM ON STACK AND SAVE REGISTERS
+	addi		$sp, $sp, -8		#Make room on stack for 4 words
+	sw		$ra, 0($sp)		#Store $ra on element 0 of stack
+	sw		$a1, 4($sp)		#Store max on element 1 of stack
+	
 	#BLINK EACH NUM IN SEQUENCE
-	li		$t0, 0			#Counter
-	lw		$t1, 0($a1)		#Load word of max from $a1
+	li		$s4, 0			#Counter
 	move		$t2, $a0		#Copy address of sequence to $t2
 	
 	userCheckLoop:	
 	#GET USER INPUT
-	li		$v0, 12			#Load syscall for read int
-	syscall					#Execute
+	jal		getChar			#Get character from user
 	
 	#CHECK IF CORRECT
 	addi		$v0, $v0, -48		#Convert ascii to decimal
@@ -484,16 +437,45 @@ userCheck:
 	
 	#INCREMENT AND CHECK
 	addi		$t2, $t2, 4		#Increment to next element
-	addi		$t0, $t0, 1		#Increment counter by 1
+	addi		$s4, $s4, 1		#Increment counter by 1
 	
-	bne		$t0, $t1, userCheckLoop	#Loop if counter has not reached max
-	
-	#USER PASS
+	#BLINK AND LOOP
+	li		$a1, 70			#Reset $a1
+	jal		blinkNum		#Jump and link to blinkNum
+	lw		$a1, 4($sp)		#Load max pointer of stack
+	lw		$a1, 0($a1)		#Load max of stack
+	bne		$s4, $a1, userCheckLoop	#Loop if counter has not reached max
 	li		$v0, 1			#Set return to 1 (WIN)
+	
+	#RESTORE $RA
+	lw		$ra, 0($sp)		#Restore $ra from stack
+	addi		$sp, $sp, 8		#Readjust stack
 	jr		$ra			#Return
 	
-	#IF USER FAILS
 	fail:
+	#FAIL SOUND
+	li		$a0, 0			#Pitch
+	li		$a1, 4000		#Duration
+	li		$a2, 0			#Instrument
+	li		$a3, 127		#Volume
+	li		$v0, 31			#Load syscall
+	syscall					#Execute
+	
+	#PAUSE
+	li		$a0, 1200		#Sleep for 800ms
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
+	
+	#IF USER FAILS
+	#PLAY FAILURE
+	lw		$a0, 0($t2)		#Get element from sequence
+	li		$a1, 200		#Delay
+	jal		blinkNum		#Jump and link to blinkNum
+	lw		$a0, 0($t2)		#Get element from sequence
+	li		$a1, 200		#Delay
+	jal		blinkNum		#Jump and link to blinkNum	
+	
+	#LEAVE
 	li		$v0, 0			#Set return to 0 (LOSE)
 	j		printResult		#Jump straight to printResult
 
@@ -533,8 +515,8 @@ drawDot:
 calculateAddress:
 	#CALCULATIONS
 	sll		$a0, $a0, 2		#Multiply $a0 by 4
-	sll		$a1, $a1, 5		#Multiply $a1 by 32
-	sll		$a1, $a1, 2		#Multiply $a1 by 4
+	sll		$a1, $a1, 7		#Multiply $a1 by 256
+	sll		$a1, $a1, 3		#Multiply $a1 by 4
 	add		$a0, $a0, $a1		#Add $a1 to $a0
 	addi		$v0, $a0, 0x10040000	#Add base address for display + $a0 to $v0
 	
@@ -663,8 +645,8 @@ drawBox:
 	
 	jr		$ra			#Return
 	
-#Procedure: drawBox:
-#Draw a box on the bitmap display
+#Procedure: clearDisplay:
+#Clear a box on the bitmap display
 clearDisplay:
 	#MAKE ROOM ON STACK
 	addi		$sp, $sp, -4		#Make room on stack for 1 words
@@ -674,7 +656,7 @@ clearDisplay:
 	la		$a0, 0			#x-coordinate = 0
 	la		$a1, 0			#y-coordinate = 0
 	la		$a2, 0			#colour = black
-	la		$a3, 32			#size to clear = 32
+	la		$a3, 256			#size to clear = 32
 	
 	jal		drawBox			#Clear Screen
 	
@@ -683,6 +665,243 @@ clearDisplay:
 	addi		$sp, $sp, 4		#Readjust stack
 	
 	jr		$ra			#Return
+		
+#Procedure: blinkNum:
+#Clear a box on the bitmap display
+#$a0 = num to blink
+#$a1 = delay
+blinkNum:
+#BLINK CORRECT
+	#MAKE ROOM ON STACK AND SAVE REGISTERS
+	addi		$sp, $sp, -8		#Make room on stack for 2 words
+	sw		$ra, 0($sp)		#Store $ra on element 0 of stack
+	sw		$a1, 4($sp)		#Store $a1 on element 1 of stack
+	
+	
+
+	#BRANCH
+	beq		$a0, 1, playBlue	#BLUE
+	beq		$a0, 2,	playGreen	#GREEN
+	beq		$a0, 3,	playRed		#RED
+	beq		$a0, 4,	playMagenta	#MAGENTA
+
+	#BLINK BLUE
+	blinkCBlue:
+	playBlue:
+	#PLAY TONE BLUE
+	li		$a0, 60			#Pitch
+	li		$a1, 1000		#Duration
+	li		$a2, 0			#Instrument
+	li		$a3, 127		#Volume
+	li		$v0, 31			#Load syscall
+	syscall					#Execute
+	
+	#DRAW
+	la		$a0, 8			#x = 1
+	la		$a1, 8			#y = 1
+	la		$a2, 1			#colour = 1
+	la		$a3, 112		#square size = 14
+	jal		drawBox			#Jump and link to drawBox
+
+	#PAUSE
+	lw		$a0, 4($sp)		#delay
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
+	
+	#BLINK
+	la		$a0, 8			#x = 1
+	la		$a1, 8			#y = 1
+	la		$a2, 0			#colour = 0
+	la		$a3, 112		#square size = 14
+	jal		drawBox			#Jump and link to drawBox
+	
+	#PAUSE
+	lw		$a0, 4($sp)		#delay
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
+	
+	#BLINK
+	la		$a0, 8			#x = 1
+	la		$a1, 8			#y = 1
+	la		$a2, 0			#colour = 0
+	la		$a3, 112			#square size = 14
+	jal		drawBox			#Jump and link to drawBox
+	j		continueUserCheck
+	
+	#BLINK GREEN
+	playGreen:
+	#PLAY TONE GREEN
+	li		$a0, 65			#Pitch
+	li		$a1, 1000		#Duration
+	li		$a2, 0			#Instrument
+	li		$a3, 127		#Volume
+	li		$v0, 31			#Load syscall
+	syscall					#Execute
+	
+	#DRAW
+	blinkCGreen:
+	la		$a0, 8			#x = 1
+	la		$a1, 136		#y = 17
+	la		$a2, 2			#colour = 2
+	la		$a3, 112		#square size = 14
+	jal		drawBox			#Jump and link to drawBox
+
+	#PAUSE
+	lw		$a0, 4($sp)		#delay
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
+	
+	#BLINK
+	la		$a0, 8			#x = 1
+	la		$a1, 136		#y = 17
+	la		$a2, 0			#colour = 0
+	la		$a3, 112		#square size = 14
+	jal		drawBox			#Jump and link to drawBox
+	
+	#PAUSE
+	lw		$a0, 4($sp)		#delay
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
+	
+	#BLINK
+	la		$a0, 8			#x = 1
+	la		$a1, 136		#y = 17
+	la		$a2, 0			#colour = 0
+	la		$a3, 112		#square size = 14
+	jal		drawBox			#Jump and link to drawBox
+	j		continueUserCheck
+	
+	#BLINK RED
+	playRed:
+	#PLAY TONE RED
+	li		$a0, 70			#Pitch
+	li		$a1, 1000		#Duration
+	li		$a2, 0			#Instrument
+	li		$a3, 127		#Volume
+	li		$v0, 31			#Load syscall
+	syscall					#Execute
+	
+	#DRAW
+	blinkCRed:
+	la		$a0, 136		#x = 17
+	la		$a1, 8			#y = 1
+	la		$a2, 3			#colour = 3
+	la		$a3, 112		#square size = 14
+	jal		drawBox			#Jump and link to drawBox
+
+	#PAUSE
+	lw		$a0, 4($sp)		#delay
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
+	
+	#BLINK
+	la		$a0, 136		#x = 17
+	la		$a1, 8			#y = 1
+	la		$a2, 0			#colour = 0
+	la		$a3, 112		#square size = 14
+	jal		drawBox			#Jump and link to drawBoxS
+	
+	#PAUSE
+	lw		$a0, 4($sp)		#delay
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
+	
+	#BLINK
+	la		$a0, 136		#x = 17
+	la		$a1, 8			#y = 1
+	la		$a2, 0			#colour = 0
+	la		$a3, 112		#square size = 14
+	jal		drawBox			#Jump and link to drawBoxS
+	j		continueUserCheck
+	
+	#BLINK MAGENTA
+	playMagenta:
+	#PLAY TONE MAGENTA
+	li		$a0, 75			#Pitch
+	li		$a1, 1000		#Duration
+	li		$a2, 0			#Instrument
+	li		$a3, 127		#Volume
+	li		$v0, 31			#Load syscall
+	syscall					#Execute
+	
+	#DRAW
+	blinkCMagenta:
+	la		$a0, 136		#x = 17
+	la		$a1, 136		#y = 17
+	la		$a2, 5			#colour = 5
+	la		$a3, 112		#square size = 14
+	jal		drawBox			#Jump and link to drawBox
+
+	#PAUSE
+	lw		$a0, 4($sp)		#delay
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
+	
+	#BLINK
+	la		$a0, 136		#x = 17
+	la		$a1, 136		#y = 17
+	la		$a2, 0			#colour = 0
+	la		$a3, 112		#square size = 14
+	jal		drawBox			#Jump and link to drawBox
+	
+	#PAUSE
+	lw		$a0, 4($sp)		#delay
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
+	
+	#BLINK
+	la		$a0, 136		#x = 17
+	la		$a1, 136		#y = 17
+	la		$a2, 0			#colour = 0
+	la		$a3, 112		#square size = 14
+	jal		drawBox			#Jump and link to drawBox
+	j		continueUserCheck
+		
+	continueUserCheck:
+	#RESTORE $RA
+	lw		$ra, 0($sp)		#Restore $ra from stack
+	addi		$sp, $sp, 8		#Readjust stack
+	jr		$ra			#Return
+
+#Procedure: getChar
+#Poll the keypad, wait for input
+getChar:
+	#MAKE ROOM ON STACK AND SAVE REGISTERS
+	addi		$sp, $sp, -4		#Make room on stack for 1 words
+	sw		$ra, 0($sp)		#Store $ra on element 0 of stack
+	li		$s3, 0			#Counter
+	j		check			#Skip first sleep
+	
+	charLoop:
+	#SLEEP
+	li		$a0, 1000		#1 second sleep
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
+	
+	#POLLING
+	check:
+	jal		isCharThere		#Jump and link to isCharThere
+	addi		$s3, $s3, 1		#Increment $s3
+	beq		$s3, 10, leaveChar	#If 5 seconds have passed, leave
+	beqz  		$v0, charLoop		#If there is input, finish polling, else loop
+	
+	leaveChar:
+	lui		$t0, 0xffff		#Register 0xffff0000
+	lw		$v0, 4($t0)		#Get control
+	
+	#RESTORE $RA
+	lw		$ra, 0($sp)		#Restore $ra from stack
+	addi		$sp, $sp, 4		#Readjust stack
+	jr		$ra
+	
+#Procedure: isCharThere
+#Poll the keypad, wait for input
+#v0 = 0 (no data) or 1 (char in buffer)
+isCharThere:
+	lui		$t0, 0xffff		#Register 0xffff0000
+	lw		$t1, 0($t0)		#Get control
+	and		$v0, $t1, 1		#Look at least significent bit
+	jr		$ra
 	
 #Procedure: drawCircle:
 #Draw a circle in the center of the input pixel (This will be implemented using the 
