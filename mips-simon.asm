@@ -38,24 +38,14 @@ main:
 	la		$sp, stack_end
 
 	#DRAW BLUE CIRCLE
-	la		$a0, 14			#x = 1
-	la		$a1, 14			#y = 1
-	la		$a2, 2			#colour = 1
-	la		$a3, 15			#square size = 14
-	
+	la		$a0, 64			#x = 1
+	la		$a1, 64			#y = 1
+	la		$a2, 1			#colour = 1
+	la		$a3, 64			#square size = 14
 	blueFillLoop:
-	jal		drawCircle		#Jump and link to drawBox
+	jal		drawCircle		#Jump and link to drawCircle
 	addi		$a3, $a3, -1		#Decrement radius
 	bnez		$a3, blueFillLoop	#If a3 is not 0, branch
-	
-	j		exit
-
-	#DRAW BLUE SQUARE
-	la		$a0, 8			#x = 1
-	la		$a1, 8			#y = 1
-	la		$a2, 1			#colour = 1
-	la		$a3, 112		#square size = 14
-	jal		drawBox			#Jump and link to drawBox
 	
 	#PLAY TONE BLUE
 	li		$a0, 60			#Pitch
@@ -65,12 +55,15 @@ main:
 	li		$v0, 31			#Load syscall
 	syscall					#Execute
 	
-	#DRAW GREEN SQUARE
-	la		$a0, 8			#x = 1
-	la		$a1, 136		#y = 17
-	la		$a2, 2			#colour = 2
-	la		$a3, 112		#square size = 14
-	jal		drawBox			#Jump and link to drawBox
+	#DRAW GREEN CIRCLE
+	la		$a0, 192		#x = 1
+	la		$a1, 64			#y = 1
+	la		$a2, 2			#colour = 1
+	la		$a3, 64			#square size = 14
+	greenFillLoop:
+	jal		drawCircle		#Jump and link to drawCircle
+	addi		$a3, $a3, -1		#Decrement radius
+	bnez		$a3, greenFillLoop	#If a3 is not 0, branch
 	
 	#PLAY TONE GREEN
 	li		$a0, 65			#Pitch
@@ -80,12 +73,15 @@ main:
 	li		$v0, 31			#Load syscall
 	syscall					#Execute
 	
-	#DRAW RED SQUARE
-	la		$a0, 136		#x = 17
-	la		$a1, 8			#y = 1
-	la		$a2, 3			#colour = 3
-	la		$a3, 112		#square size = 14
-	jal		drawBox			#Jump and link to drawBox
+	#DRAW RED CIRCLE
+	la		$a0, 64			#x = 1
+	la		$a1, 192		#y = 1
+	la		$a2, 3			#colour = 1
+	la		$a3, 64			#square size = 14
+	redFillLoop:
+	jal		drawCircle		#Jump and link to drawCircle
+	addi		$a3, $a3, -1		#Decrement radius
+	bnez		$a3, redFillLoop	#If a3 is not 0, branch
 	
 	#PLAY TONE RED
 	li		$a0, 70			#Pitch
@@ -95,12 +91,15 @@ main:
 	li		$v0, 31			#Load syscall
 	syscall					#Execute
 	
-	#DRAW MAGENTA SQUARE
-	la		$a0, 136		#x = 17
-	la		$a1, 136		#y = 17
-	la		$a2, 5			#colour = 5
-	la		$a3, 112		#square size = 14
-	jal		drawBox			#Jump and link to drawBox
+	#DRAW MAGENTA CIRCLE
+	la		$a0, 192		#x = 1
+	la		$a1, 192		#y = 1
+	la		$a2, 5			#colour = 1
+	la		$a3, 64			#square size = 14
+	magentaFillLoop:
+	jal		drawCircle		#Jump and link to drawCircle
+	addi		$a3, $a3, -1		#Decrement radius
+	bnez		$a3, magentaFillLoop	#If a3 is not 0, branch
 	
 	#PLAY TONE MAGENTA
 	li		$a0, 75			#Pitch
