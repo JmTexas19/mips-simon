@@ -293,12 +293,13 @@ addToSeq:
 #$a1 pointer to max
 displaySeq:
 	#MAKE ROOM ON STACK AND SAVE REGISTERS
-	addi		$sp, $sp, -4		#Make room on stack for 4 words
+	addi		$sp, $sp, -8		#Make room on stack for 4 words
 	sw		$ra, 0($sp)		#Store $ra on element 0 of stack
+	sw		$a0, 4($sp)		#Store $ra on element 0 of stack
 	lw		$s3, 0($a1)		#Load word of max into $t0
 	
 	#FOR LOOP FOR GOING THROUGH SEQUENCE ONE BY ONE
-	li		$s2, 1			#Counter for going through loop one by one number of elements to display [counter 2]
+	li		$s2, 2			#Counter for going through loop one by one number of elements to display [counter 2]
 	move		$t5, $a0		#Save pointer to first element in sequence in $t5
 	lw		$t1, 0($a1)		#Load word of max from $a1
 	forLoop:	
