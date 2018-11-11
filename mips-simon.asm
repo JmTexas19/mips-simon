@@ -354,6 +354,12 @@ displaySeq:
 	
 	#CHECK IF DONE
 	beq 		$s2, $s3, displayDone	#If loop does not equal max, branch
+	
+	#PAUSE
+	li		$a0, 1200		#Sleep for 800ms
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
+	move		$a0, $t5		#Reset $a0 address
 
 	displayUserCheckSkip:
 	#BLINK EACH NUM IN SEQUENCE
@@ -368,6 +374,7 @@ displaySeq:
 	blinkLoop:	
 	lw		$t3, 0($t2)		#Load element from sequence
 	move		$a0, $t3		#Copy num to blink
+	li		$a1, 700		#Reset $a1
 	jal		blinkNum
 		
 	returnLoop:				#Return from blink
@@ -420,6 +427,7 @@ userCheck:
 	addi		$t0, $t0, 1		#Increment counter by 1
 	
 	#BLINK AND LOOP
+	li		$a1, 70		#Reset $a1
 	jal		blinkNum		#Jump and link to blinkNum
 	bne		$t0, $t1, userCheckLoop	#Loop if counter has not reached max
 	li		$v0, 1			#Set return to 1 (WIN)
@@ -446,8 +454,10 @@ userCheck:
 	#IF USER FAILS
 	#PLAY FAILURE
 	lw		$a0, 0($t2)		#Get element from sequence
+	li		$a1, 200		#Delay
 	jal		blinkNum		#Jump and link to blinkNum
 	lw		$a0, 0($t2)		#Get element from sequence
+	li		$a1, 200		#Delay
 	jal		blinkNum		#Jump and link to blinkNum	
 	
 	#LEAVE
@@ -643,11 +653,15 @@ clearDisplay:
 #Procedure: blinkNum:
 #Clear a box on the bitmap display
 #$a0 = num to blink
+#$a1 = delay
 blinkNum:
 #BLINK CORRECT
 	#MAKE ROOM ON STACK AND SAVE REGISTERS
-	addi		$sp, $sp, -4		#Make room on stack for 4 words
+	addi		$sp, $sp, -8		#Make room on stack for 2 words
 	sw		$ra, 0($sp)		#Store $ra on element 0 of stack
+	sw		$a1, 4($sp)		#Store $a1 on element 1 of stack
+	
+	
 
 	#BRANCH
 	beq		$a0, 1, playBlue	#BLUE
@@ -674,7 +688,7 @@ blinkNum:
 	jal		drawBox			#Jump and link to drawBox
 
 	#PAUSE
-	li		$a0, 800		#Sleep for 800ms
+	lw		$a0, 4($sp)		#delay
 	li		$v0, 32			#Load syscall for sleep
 	syscall					#Execute
 	
@@ -686,7 +700,7 @@ blinkNum:
 	jal		drawBox			#Jump and link to drawBox
 	
 	#PAUSE
-	li		$a0, 800		#Sleep for 800ms
+	lw		$a0, 4($sp)		#delay
 	li		$v0, 32			#Load syscall for sleep
 	syscall					#Execute
 	
@@ -717,7 +731,7 @@ blinkNum:
 	jal		drawBox			#Jump and link to drawBox
 
 	#PAUSE
-	li		$a0, 800		#Sleep for 800ms
+	lw		$a0, 4($sp)		#delay
 	li		$v0, 32			#Load syscall for sleep
 	syscall					#Execute
 	
@@ -729,7 +743,7 @@ blinkNum:
 	jal		drawBox			#Jump and link to drawBox
 	
 	#PAUSE
-	li		$a0, 800		#Sleep for 800ms
+	lw		$a0, 4($sp)		#delay
 	li		$v0, 32			#Load syscall for sleep
 	syscall					#Execute
 	
@@ -760,7 +774,7 @@ blinkNum:
 	jal		drawBox			#Jump and link to drawBox
 
 	#PAUSE
-	li		$a0, 800		#Sleep for 800ms
+	lw		$a0, 4($sp)		#delay
 	li		$v0, 32			#Load syscall for sleep
 	syscall					#Execute
 	
@@ -772,7 +786,7 @@ blinkNum:
 	jal		drawBox			#Jump and link to drawBoxS
 	
 	#PAUSE
-	li		$a0, 800		#Sleep for 800ms
+	lw		$a0, 4($sp)		#delay
 	li		$v0, 32			#Load syscall for sleep
 	syscall					#Execute
 	
@@ -803,7 +817,7 @@ blinkNum:
 	jal		drawBox			#Jump and link to drawBox
 
 	#PAUSE
-	li		$a0, 800		#Sleep for 800ms
+	lw		$a0, 4($sp)		#delay
 	li		$v0, 32			#Load syscall for sleep
 	syscall					#Execute
 	
@@ -815,7 +829,7 @@ blinkNum:
 	jal		drawBox			#Jump and link to drawBox
 	
 	#PAUSE
-	li		$a0, 800		#Sleep for 800ms
+	lw		$a0, 4($sp)		#delay
 	li		$v0, 32			#Load syscall for sleep
 	syscall					#Execute
 	
@@ -830,7 +844,7 @@ blinkNum:
 	continueUserCheck:
 	#RESTORE $RA
 	lw		$ra, 0($sp)		#Restore $ra from stack
-	addi		$sp, $sp, 4		#Readjust stack
+	addi		$sp, $sp, 8		#Readjust stack
 	jr		$ra			#Return
 
 	
