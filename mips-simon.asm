@@ -670,6 +670,58 @@ clearDisplay:
 	
 	jr		$ra			#Return
 	
+#Procedure: drawCircle:
+#Draw a circle in the center of the input pixel (This will be implemented using the 
+#midpoint circle algorithm from https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
+#a0 = pointer to x0
+#a1 = pointer to y0
+#a2 = pointer to radius
+drawCircle:
+	#MAKE ROOM ON STACK
+	addi		$sp, $sp, -4		#Make room on stack for 1 words
+	sw		$ra, 0($sp)		#Store $ra on element 4 of stack
+
+	#VARIABLES
+	lw		$t0, 0($a0)		#x0
+	lw		$t1, 0($a1)		#y0
+	lw		$t2, 0($a2)		#radius
+	addi		$t3, $t2, -1		#x
+	li		$t4, 0			#y
+	li		$t5, 1			#dx
+	li		$t6, 1			#dy
+	li		$t7, 0			#Err
 	
-
-
+	#CALCULATE ERR (dx - (radius << 1))
+	sll		$t8, $t2, 1		#Bitshift radius left 1	
+	subu		$t7, $t5, $t8		#Subtract dx - shifted radius 
+	
+	circleLoop:
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
