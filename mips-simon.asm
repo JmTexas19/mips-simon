@@ -154,8 +154,7 @@ main:
 	jal		displaySeq		#Jump and link to displaySeq
 	li		$v0, 1			#Set $v0 to win
 	
-	printResult:
-	
+	printResult:	
 	#PRINT RESULT
 	beq		$v0, 0, lose		#Branch if return is equal to 0
 	beq		$v0, 1, win		#Branch if return is equal to 1
@@ -170,21 +169,7 @@ main:
 	li		$v0, 11			#Load print character syscall
 	addi		$a0, $0, 0xA		#Load ascii character for newline into $a0
 	syscall					#Execute
-	
-	#RESET ALL VALUES AND LOOP
-	li		$t0, 0
-	li		$t1, 0
-	li		$t2, 0
-	li		$t3, 0
-	li		$t4, 0
-	li		$t5, 0
-	li		$t6, 0
-	li		$s1, 0
-	li		$s2, 0
-	li		$a0, 0
-	li		$a1, 0
-	li		$a2, 0
-	j		main			#Loop program
+	j		resetReg		#Loop program
 	
 	#WIN
 	win:
@@ -196,7 +181,7 @@ main:
 	li		$v0, 11			#Load print character syscall
 	addi		$a0, $0, 0xA		#Load ascii character for newline into $a0
 	syscall					#Execute
-	j		main			#Loop program
+	j		resetReg		#Loop program
 	
 	#INVALID NUM
 	invalidNum:
@@ -208,6 +193,24 @@ main:
 	li		$v0, 11			#Load print character syscall
 	addi		$a0, $0, 0xA		#Load ascii character for newline into $a0
 	syscall					#Execute
+	j		resetReg		#Loop program
+	
+	resetReg:
+	#RESET ALL REGISTERS AND LOOP
+	li		$t0, 0
+	li		$t1, 0
+	li		$t2, 0
+	li		$t3, 0
+	li		$t4, 0
+	li		$t5, 0
+	li		$t6, 0
+	li		$s1, 0
+	li		$s2, 0
+	li		$s3, 0
+	li		$a0, 0
+	li		$a1, 0
+	li		$a2, 0
+	li		$v0, 0
 	j		main			#Loop program
 	
 	#EXIT
