@@ -38,11 +38,15 @@ main:
 	la		$sp, stack_end
 
 	#DRAW BLUE CIRCLE
-	la		$a0, 128			#x = 1
-	la		$a1, 128			#y = 1
+	la		$a0, 14			#x = 1
+	la		$a1, 14			#y = 1
 	la		$a2, 2			#colour = 1
-	la		$a3, 64		#square size = 14
+	la		$a3, 15			#square size = 14
+	
+	blueFillLoop:
 	jal		drawCircle		#Jump and link to drawBox
+	addi		$a3, $a3, -1		#Decrement radius
+	bnez		$a3, blueFillLoop	#If a3 is not 0, branch
 	
 	j		exit
 
@@ -784,9 +788,15 @@ drawCircle:
 	#CONTINUE
 	skipCircleLoop:		
 	
-	#RESTORE $RA
-	lw		$ra, 0($sp)		#Restore $ra from stack
+	#RESTORE REGISTERS
+	lw		$ra, 0($sp)		
+	lw		$a0, 4($sp)		
+	lw		$a1, 8($sp)		
+	lw		$a2, 12($sp)		
+	lw		$a3, 16($sp)		
 	addi		$sp, $sp, 20		#Readjust stack
+	
+	jr		$ra
 	
 
 	
