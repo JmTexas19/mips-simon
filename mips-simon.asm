@@ -152,11 +152,9 @@ main:
 	
 	#DISPLAY SEQUENCE
 	jal		displaySeq		#Jump and link to displaySeq
+	li		$v0, 1			#Set $v0 to win
 	
-	#USER CHECK
-	la		$a0, seqArray		#Load address of seqArray into $a0 (THIS IS DONE TO RESET TO START OF ARRAY)
-	la		$a1, max		#Load address of max into $a1 (THIS IS DONE TO RESET TO START OF ARRAY)
-	jal		userCheck		#Jump and link to displaySeq
+	printResult:
 	
 	#PRINT RESULT
 	beq		$v0, 0, lose		#Branch if return is equal to 0
@@ -172,6 +170,20 @@ main:
 	li		$v0, 11			#Load print character syscall
 	addi		$a0, $0, 0xA		#Load ascii character for newline into $a0
 	syscall					#Execute
+	
+	#RESET ALL VALUES AND LOOP
+	li		$t0, 0
+	li		$t1, 0
+	li		$t2, 0
+	li		$t3, 0
+	li		$t4, 0
+	li		$t5, 0
+	li		$t6, 0
+	li		$s1, 0
+	li		$s2, 0
+	li		$a0, 0
+	li		$a1, 0
+	li		$a2, 0
 	j		main			#Loop program
 	
 	#WIN
@@ -280,15 +292,38 @@ addToSeq:
 #$a0 pointer to seqArray
 #$a1 pointer to max
 displaySeq:
-	#MAKE ROOM ON STACK
-	addi		$sp, $sp, -4		#Make room on stack for 1 words
-	sw		$ra, 0($sp)		#Store $ra on element 4 of stack	
-
-	#BLINK EACH NUM IN SEQUENCE
-	li		$s1 0			#Counter
+	#MAKE ROOM ON STACK AND SAVE REGISTERS
+	addi		$sp, $sp, -4		#Make room on stack for 4 words
+	sw		$ra, 0($sp)		#Store $ra on element 0 of stack
+	lw		$s3, 0($a1)		#Load word of max into $t0
+	
+	#FOR LOOP FOR GOING THROUGH SEQUENCE ONE BY ONE
+	li		$s2, 1			#Counter for going through loop one by one number of elements to display [counter 2]
+	move		$t5, $a0		#Save pointer to first element in sequence in $t5
 	lw		$t1, 0($a1)		#Load word of max from $a1
+	forLoop:	
+	beqz  		$s1, displayUserCheckSkip	#If counter 1 is equal to 0, skip userCheck
+	
+	#RESET ADDRESSES
+	li		$a0, 0			#Reset $a0
+	li		$a1, 0			#Reset $a1
+	move		$a0, $t5		#Reset $a0 address
+	la		$a1, 4($sp)		#Reset $a1 address
+	
+	#USER CHECK
+	addi		$s2, $s2, 1		#Increment counter 2 by 1
+	sw		$s2, 0($a1)		#Store new max into label
+	jal		userCheck		#Jump and link to user check
+	move		$a0, $t5		#Reset $a0 address
+	
+	#CHECK IF DONE
+	beq 		$s2, $s3, displayDone	#If loop does not equal max, branch
+
+	displayUserCheckSkip:
+	#BLINK EACH NUM IN SEQUENCE
+	li		$s1, 0			#Counter
 	move		$t2, $a0		#Copy address of sequence to $t2
-	move		$t4, $a1		#Copy pointer to max to $t4
+	move		$t4, $a1		#Copy pointer of max to $t4
 	
 	#CLEAR DISPLAY
 	jal		clearDisplay		#Clear Display
@@ -303,7 +338,7 @@ displaySeq:
 	returnLoop:				#Return from blink
 	
 	#INCREMENT AND CHECK
-	addi		$t2, $t2, 4		#Increment to next element
+	addi		$t2, $t2, 4		#Increment to next element in sequence
 	addi		$s1, $s1, 1		#Increment counter by 1
 	
 	#PAUSE
@@ -311,8 +346,11 @@ displaySeq:
 	li		$v0, 32			#Load syscall for sleep
 	syscall					#Execute
 	
-	bne		$s1, $t1, blinkLoop	#Loop if counter has not reached max
+	ble   		$s1, $s2, blinkLoop	#Loop if counter has not reached 2nd counter
 	
+	j		forLoop
+	
+	displayDone:
 	#RESTORE $RA
 	lw		$ra, 0($sp)		#Restore $ra from stack
 	addi		$sp, $sp, 4		#Readjust stack
@@ -416,12 +454,14 @@ userCheck:
 	li		$t0, 0			#Counter
 	lw		$t1, 0($a1)		#Load word of max from $a1
 	move		$t2, $a0		#Copy address of sequence to $t2
+	
 	userCheckLoop:	
 	#GET USER INPUT
-	li		$v0, 5			#Load syscall for read int
+	li		$v0, 12			#Load syscall for read int
 	syscall					#Execute
 	
 	#CHECK IF CORRECT
+	addi		$v0, $v0, -48		#Convert ascii to decimal
 	lw		$a0, 0($t2)		#Get element from sequence
 	bne		$v0, $a0, fail		#Check if user input is correct
 	
@@ -438,7 +478,7 @@ userCheck:
 	#IF USER FAILS
 	fail:
 	li		$v0, 0			#Set return to 0 (LOSE)
-	jr		$ra			#Return
+	j		printResult		#Jump straight to printResult
 
 #Procedure: drawDot:
 #Draw a dot on the bitmap display
