@@ -642,7 +642,7 @@ clearDisplay:
 	la		$a0, 0			#x-coordinate = 0
 	la		$a1, 0			#y-coordinate = 0
 	la		$a2, 0			#colour = black
-	la		$a3, 32			#size to clear = 32
+	la		$a3, 256			#size to clear = 32
 	
 	jal		drawBox			#Clear Screen
 	
@@ -683,10 +683,10 @@ blinkNum:
 	syscall					#Execute
 	
 	#DRAW
-	la		$a0, 1			#x = 1
-	la		$a1, 1			#y = 1
+	la		$a0, 8			#x = 1
+	la		$a1, 8			#y = 1
 	la		$a2, 1			#colour = 1
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBox
 
 	#PAUSE
@@ -695,10 +695,10 @@ blinkNum:
 	syscall					#Execute
 	
 	#BLINK
-	la		$a0, 1			#x = 1
-	la		$a1, 1			#y = 1
+	la		$a0, 8			#x = 1
+	la		$a1, 8			#y = 1
 	la		$a2, 0			#colour = 0
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBox
 	
 	#PAUSE
@@ -707,10 +707,10 @@ blinkNum:
 	syscall					#Execute
 	
 	#BLINK
-	la		$a0, 1			#x = 1
-	la		$a1, 1			#y = 1
+	la		$a0, 8			#x = 1
+	la		$a1, 8			#y = 1
 	la		$a2, 0			#colour = 0
-	la		$a3, 14			#square size = 14
+	la		$a3, 112			#square size = 14
 	jal		drawBox			#Jump and link to drawBox
 	j		continueUserCheck
 	
@@ -726,10 +726,10 @@ blinkNum:
 	
 	#DRAW
 	blinkCGreen:
-	la		$a0, 1			#x = 1
-	la		$a1, 17			#y = 17
+	la		$a0, 8			#x = 1
+	la		$a1, 136		#y = 17
 	la		$a2, 2			#colour = 2
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBox
 
 	#PAUSE
@@ -738,10 +738,10 @@ blinkNum:
 	syscall					#Execute
 	
 	#BLINK
-	la		$a0, 1			#x = 1
-	la		$a1, 17			#y = 17
+	la		$a0, 8			#x = 1
+	la		$a1, 136		#y = 17
 	la		$a2, 0			#colour = 0
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBox
 	
 	#PAUSE
@@ -750,10 +750,10 @@ blinkNum:
 	syscall					#Execute
 	
 	#BLINK
-	la		$a0, 1			#x = 1
-	la		$a1, 17			#y = 17
+	la		$a0, 8			#x = 1
+	la		$a1, 136		#y = 17
 	la		$a2, 0			#colour = 0
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBox
 	j		continueUserCheck
 	
@@ -769,10 +769,10 @@ blinkNum:
 	
 	#DRAW
 	blinkCRed:
-	la		$a0, 17			#x = 17
-	la		$a1, 1			#y = 1
+	la		$a0, 136		#x = 17
+	la		$a1, 8			#y = 1
 	la		$a2, 3			#colour = 3
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBox
 
 	#PAUSE
@@ -781,10 +781,10 @@ blinkNum:
 	syscall					#Execute
 	
 	#BLINK
-	la		$a0, 17			#x = 17
-	la		$a1, 1			#y = 1
+	la		$a0, 136		#x = 17
+	la		$a1, 8			#y = 1
 	la		$a2, 0			#colour = 0
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBoxS
 	
 	#PAUSE
@@ -793,10 +793,10 @@ blinkNum:
 	syscall					#Execute
 	
 	#BLINK
-	la		$a0, 17			#x = 17
-	la		$a1, 1			#y = 1
+	la		$a0, 136		#x = 17
+	la		$a1, 8			#y = 1
 	la		$a2, 0			#colour = 0
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBoxS
 	j		continueUserCheck
 	
@@ -812,10 +812,10 @@ blinkNum:
 	
 	#DRAW
 	blinkCMagenta:
-	la		$a0, 17			#x = 17
-	la		$a1, 17			#y = 17
+	la		$a0, 136		#x = 17
+	la		$a1, 136		#y = 17
 	la		$a2, 5			#colour = 5
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBox
 
 	#PAUSE
@@ -824,10 +824,10 @@ blinkNum:
 	syscall					#Execute
 	
 	#BLINK
-	la		$a0, 17			#x = 17
-	la		$a1, 17			#y = 17
+	la		$a0, 136		#x = 17
+	la		$a1, 136		#y = 17
 	la		$a2, 0			#colour = 0
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBox
 	
 	#PAUSE
@@ -836,10 +836,10 @@ blinkNum:
 	syscall					#Execute
 	
 	#BLINK
-	la		$a0, 17			#x = 17
-	la		$a1, 17			#y = 17
+	la		$a0, 136		#x = 17
+	la		$a1, 136		#y = 17
 	la		$a2, 0			#colour = 0
-	la		$a3, 14			#square size = 14
+	la		$a3, 112		#square size = 14
 	jal		drawBox			#Jump and link to drawBox
 	j		continueUserCheck
 		
