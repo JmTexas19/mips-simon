@@ -427,7 +427,7 @@ userCheck:
 	addi		$t0, $t0, 1		#Increment counter by 1
 	
 	#BLINK AND LOOP
-	li		$a1, 70		#Reset $a1
+	li		$a1, 70			#Reset $a1
 	jal		blinkNum		#Jump and link to blinkNum
 	bne		$t0, $t1, userCheckLoop	#Loop if counter has not reached max
 	li		$v0, 1			#Set return to 1 (WIN)
