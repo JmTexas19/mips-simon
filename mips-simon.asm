@@ -350,6 +350,7 @@ displaySeq:
 	addi		$s2, $s2, 1		#Increment counter 2 by 1
 	sw		$s2, 0($a1)		#Store new max into label
 	jal		userCheck		#Jump and link to user check
+	move		$t1, $s2		#Load word of max from $a1
 	move		$a0, $t5		#Reset $a0 address
 	
 	#CHECK IF DONE
@@ -404,18 +405,17 @@ displaySeq:
 #$a1 pointer to max
 userCheck:
 	#MAKE ROOM ON STACK AND SAVE REGISTERS
-	addi		$sp, $sp, -4		#Make room on stack for 4 words
+	addi		$sp, $sp, -8		#Make room on stack for 4 words
 	sw		$ra, 0($sp)		#Store $ra on element 0 of stack
+	sw		$a1, 4($sp)		#Store max on element 1 of stack
 	
 	#BLINK EACH NUM IN SEQUENCE
-	li		$t0, 0			#Counter
-	lw		$t1, 0($a1)		#Load word of max from $a1
+	li		$s4, 0			#Counter
 	move		$t2, $a0		#Copy address of sequence to $t2
 	
 	userCheckLoop:	
 	#GET USER INPUT
-	li		$v0, 12			#Load syscall for read int
-	syscall					#Execute
+	jal		getChar			#Get character from user
 	
 	#CHECK IF CORRECT
 	addi		$v0, $v0, -48		#Convert ascii to decimal
@@ -424,17 +424,19 @@ userCheck:
 	
 	#INCREMENT AND CHECK
 	addi		$t2, $t2, 4		#Increment to next element
-	addi		$t0, $t0, 1		#Increment counter by 1
+	addi		$s4, $s4, 1		#Increment counter by 1
 	
 	#BLINK AND LOOP
 	li		$a1, 70			#Reset $a1
 	jal		blinkNum		#Jump and link to blinkNum
-	bne		$t0, $t1, userCheckLoop	#Loop if counter has not reached max
+	lw		$a1, 4($sp)		#Load max pointer of stack
+	lw		$a1, 0($a1)		#Load max of stack
+	bne		$s4, $a1, userCheckLoop	#Loop if counter has not reached max
 	li		$v0, 1			#Set return to 1 (WIN)
 	
 	#RESTORE $RA
 	lw		$ra, 0($sp)		#Restore $ra from stack
-	addi		$sp, $sp, 4		#Readjust stack
+	addi		$sp, $sp, 8		#Readjust stack
 	jr		$ra			#Return
 	
 	fail:
@@ -847,7 +849,46 @@ blinkNum:
 	addi		$sp, $sp, 8		#Readjust stack
 	jr		$ra			#Return
 
+#Procedure: getChar
+#Poll the keypad, wait for input
+getChar:
+	#MAKE ROOM ON STACK AND SAVE REGISTERS
+	addi		$sp, $sp, -4		#Make room on stack for 1 words
+	sw		$ra, 0($sp)		#Store $ra on element 0 of stack
+	li		$s3, 0			#Counter
+	j		check			#Skip first sleep
 	
+	charLoop:
+	#SLEEP
+	li		$a0, 1000		#1 second sleep
+	li		$v0, 32			#Load syscall for sleep
+	syscall					#Execute
 	
+	#POLLING
+	check:
+	jal		isCharThere		#Jump and link to isCharThere
+	addi		$s3, $s3, 1		#Increment $s3
+	beq		$s3, 10, leaveChar	#If 5 seconds have passed, leave
+	beqz  		$v0, charLoop		#If there is input, finish polling, else loop
+	
+	leaveChar:
+	lui		$t0, 0xffff		#Register 0xffff0000
+	lw		$v0, 4($t0)		#Get control
+	
+	#RESTORE $RA
+	lw		$ra, 0($sp)		#Restore $ra from stack
+	addi		$sp, $sp, 4		#Readjust stack
+	jr		$ra
+	
+#Procedure: isCharThere
+#Poll the keypad, wait for input
+#v0 = 0 (no data) or 1 (char in buffer)
+isCharThere:
+	lui		$t0, 0xffff		#Register 0xffff0000
+	lw		$t1, 0($t0)		#Get control
+	and		$v0, $t1, 1		#Look at least significent bit
+	jr		$ra
+	
+		
 
 
